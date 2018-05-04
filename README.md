@@ -11,20 +11,26 @@ If you want see the view graph svg logs
 * sudo apt-get install graphviz
 
 **2. Build SemanticSfM**
+```
  $ cd SemanticSfM
  $ mkdir build&& cd build
  $ cmake ..
+ ```
 
 Compile the project
- $ make
+ * $ make
 
 For a multi-core compilation (Replace NBcore with the number of threads)
- $ make -j NBcore
+ * $ make -j NBcore
 
 For test if build successfully
- $ make test
+ *$ make test
 
 **3. Run SemanticSfM**
- python SemanticSfM/build/software/Sfm/Sfm_SequentialPipeline.py ${image_dir} ${output_dir} 0 or
- ./do.sh ${image_dir} ${output_dir}
+
+ * python SemanticSfM/build/software/Sfm/Sfm_SequentialPipeline.py ${image_dir} ${output_dir} 0 
+ 
+ or
+
+ * ./do.sh ${image_dir} ${output_dir}
 
