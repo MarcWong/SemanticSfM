@@ -1,0 +1,5 @@
+project(chessboard_undistortion)
+find_package(OpenCV REQUIRED PATHS "/home/gaomz/opencvlib/share/")
+add_executable(chessboard_undistortion chessboard_undistortion.cpp)
+target_link_libraries(chessboard_undistortion ${OpenCV_LIBS})
+cmake_minimum_required(VERSION 2.8)

@@ -1,0 +1,5 @@
+project(extract_videoframe)
+find_package(OpenCV REQUIRED PATHS "/home/gaomz/opencvlib/share" NO_DEFAULT_PATH)
+add_executable(extract_videoframe extract_videoframe.cpp)
+target_link_libraries(extract_videoframe ${OpenCV_LIBS})
+cmake_minimum_required(VERSION 2.8)

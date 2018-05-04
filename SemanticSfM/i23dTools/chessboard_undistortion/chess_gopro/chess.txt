@@ -1,0 +1,9 @@
+/home/gaomz/Chessboard_undistortion/ConsoleApplication26/chess_gopro/GOPR7926_150998.jpg 
+/home/gaomz/Chessboard_undistortion/ConsoleApplication26/chess_gopro/GOPR7926_151033.jpg 
+/home/gaomz/Chessboard_undistortion/ConsoleApplication26/chess_gopro/GOPR7926_151040.jpg 
+/home/gaomz/Chessboard_undistortion/ConsoleApplication26/chess_gopro/GOPR7926_151064.jpg 
+/home/gaomz/Chessboard_undistortion/ConsoleApplication26/chess_gopro/GOPR7926_151065.jpg 
+/home/gaomz/Chessboard_undistortion/ConsoleApplication26/chess_gopro/GOPR7926_151074.jpg 
+/home/gaomz/Chessboard_undistortion/ConsoleApplication26/chess_gopro/GOPR7926_151086.jpg 
+/home/gaomz/Chessboard_undistortion/ConsoleApplication26/chess_gopro/GOPR7926_151094.jpg 
+/home/gaomz/Chessboard_undistortion/ConsoleApplication26/chess_gopro/GOPR7926_151192.jpg 

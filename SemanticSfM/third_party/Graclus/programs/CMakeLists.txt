@@ -1,0 +1,5 @@
+file(GLOB_RECURSE source . "*.cpp" "*.c" "*.h" "*.hpp" "*.inl")
+link_directories(${PROJECT_BINARY_DIR}/metisLib;${PROJECT_BINARY_DIR}/multilevelLib)
+include_directories(${PROJECT_SOURCE_DIR}/metisLib;${PROJECT_SOURCE_DIR}/multilevelLib)
+add_executable(program  ${source})
+target_link_libraries(program metis multilevel)
