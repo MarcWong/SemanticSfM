@@ -19,6 +19,9 @@ struct View
   // image path on disk
   std::string s_Img_path;
 
+  // semantic image path on disk
+  std::string semantic_img_path;
+
   // Id of the view
   IndexT id_view;
 
@@ -36,6 +39,17 @@ struct View
     IndexT pose_id = UndefinedIndexT,
     IndexT width = UndefinedIndexT, IndexT height = UndefinedIndexT)
     :s_Img_path(sImgPath), id_view(view_id), id_intrinsic(intrinsic_id),
+    id_pose(pose_id), ui_width(width), ui_height(height)
+    {}
+
+    View(
+    const std::string & sImgPath = "",
+    const std::string & semanticImgPath = "",
+    IndexT view_id = UndefinedIndexT,
+    IndexT intrinsic_id = UndefinedIndexT,
+    IndexT pose_id = UndefinedIndexT,
+    IndexT width = UndefinedIndexT, IndexT height = UndefinedIndexT)
+    :s_Img_path(sImgPath), semantic_img_path(semanticImgPath),  id_view(view_id), id_intrinsic(intrinsic_id),
     id_pose(pose_id), ui_width(width), ui_height(height)
     {}
 

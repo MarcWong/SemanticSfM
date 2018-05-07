@@ -27,6 +27,8 @@ public:
 
   virtual ~Regions() {}
 
+  virtual bool LoadSemanticLabel(const std::string& semantic_img_path) = 0;
+
   //--
   // IO - one file for region features, one file for region descriptors
   //--
@@ -103,6 +105,14 @@ public:
   bool IsBinary() const {return false;}
   std::string Type_id() const {return typeid(T).name();}
   size_t DescriptorLength() const {return static_cast<size_t>(L);}
+
+  bool LoadSemanticLabel(const std::string& semantic_img_path)
+  {
+    for(auto feature : _vec_feats)
+    {
+      
+    }
+  }
 
   /// Read from files the regions and their corresponding descriptors.
   bool Load(

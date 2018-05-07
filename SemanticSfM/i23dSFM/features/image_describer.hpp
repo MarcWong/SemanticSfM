@@ -51,6 +51,14 @@ public:
   /// Allocate regions depending of the Image_describer
   virtual void Allocate(std::unique_ptr<Regions> &regions) const = 0;
 
+
+  // Load semantic label of features
+  virtual bool LoadSemanticLabel(Regions * regions, const std::string& semantic_img_path)
+  {
+    return regions->LoadSemanticLabel(semantic_img_path);
+  }
+
+
   //--
   // IO - one file for region features, one file for region descriptors
   //--

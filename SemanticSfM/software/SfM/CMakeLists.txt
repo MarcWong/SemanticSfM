@@ -63,6 +63,18 @@ TARGET_LINK_LIBRARIES(i23dSFM_main_ComputeFeatures
       
   )
 
+ADD_EXECUTABLE(i23dSFM_main_ComputeSemanticFeatures main_ComputeSemanticFeatures.cpp)
+TARGET_LINK_LIBRARIES(i23dSFM_main_ComputeSemanticFeatures
+  i23dSFM_system
+  i23dSFM_image
+  i23dSFM_features
+  i23dSFM_multiview
+  i23dSFM_sfm
+  stlplus
+  vlsift
+      
+  )
+
 #INCLUDE_DIRECTORIES(SYSTEM)
 #FIND_PACKAGE(MPI)
 #INCLUDE_DIRECTORIES(SYSTEM ${MPI_INCLUDE_PATH})

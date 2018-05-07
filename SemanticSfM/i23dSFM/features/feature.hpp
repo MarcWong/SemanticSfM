@@ -29,28 +29,33 @@ public:
   inline PointFeature(float x=0.0f, float y=0.0f)
    : _coords(x, y) {}
 
+  inline PointFeature(float x=0.0f, float y=0.0f, int sl = -1)
+   : _coords(x, y), _semanticLabel(sl) {}
+
   inline float x() const { return _coords(0); }
   inline float y() const { return _coords(1); }
   inline const Vec2f & coords() const { return _coords;}
+  inline const int & semanticLabel() const { return _semanticLabel; }
 
   inline float& x() { return _coords(0); }
   inline float& y() { return _coords(1); }
   inline Vec2f& coords() { return _coords;}
 
   virtual inline std::ostream& print(std::ostream& os) const
-  { return os << _coords(0) << " " << _coords(1); }
+  { return os << _coords(0) << " " << _coords(1) << _semanticLabel; }
 
   virtual inline std::istream& read(std::istream& in)
-  { return in >> _coords(0) >> _coords(1); }
+  { return in >> _coords(0) >> _coords(1) >> _semanticLabel; }
 
   template<class Archive>
   void serialize(Archive & ar)
   {
-    ar (_coords(0), _coords(1));
+    ar (_coords(0), _coords(1), _semanticLabel);
   }
 
 protected:
   Vec2f _coords;  // (x, y).
+  int _semanticLabel; // semantic label
 };
 
 typedef std::vector<PointFeature> PointFeatures;
@@ -77,6 +82,13 @@ public:
   SIOPointFeature(float x=0.0f, float y=0.0f,
                   float scale=0.0f, float orient=0.0f)
     : PointFeature(x,y)
+    , _scale(scale)
+    , _orientation(orient) {}
+
+  SIOPointFeature(float x=0.0f, float y=0.0f, int sl = -1,
+                  float scale=0.0f, float orient=0.0f)
+    : PointFeature(x,y)
+    , _semanticLabel(sl)
     , _scale(scale)
     , _orientation(orient) {}
 
@@ -110,6 +122,7 @@ public:
   {
     ar (
       _coords(0), _coords(1),
+      _semanticLabel,
       _scale,
       _orientation);
   }
