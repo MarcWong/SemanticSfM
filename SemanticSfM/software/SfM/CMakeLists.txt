@@ -16,29 +16,29 @@ SET_PROPERTY(TARGET i23dSFM_main_SfMInit_ImageListing PROPERTY FOLDER I23dSFM/so
 INSTALL(TARGETS i23dSFM_main_SfMInit_ImageListing DESTINATION bin/)
 
 #convert a v0.6 lists.txt file to the new sfm_data.X format
-ADD_EXECUTABLE(i23dSFM_main_ConvertList main_ConvertList.cpp)
-TARGET_LINK_LIBRARIES(i23dSFM_main_ConvertList
-  i23dSFM_system
-  i23dSFM_features
-  i23dSFM_sfm
-  )
+# ADD_EXECUTABLE(i23dSFM_main_ConvertList main_ConvertList.cpp)
+# TARGET_LINK_LIBRARIES(i23dSFM_main_ConvertList
+#   i23dSFM_system
+#   i23dSFM_features
+#   i23dSFM_sfm
+#   )
 
 
-SET_PROPERTY(TARGET i23dSFM_main_ConvertList PROPERTY FOLDER I23dSFM/software)
-INSTALL(TARGETS i23dSFM_main_ConvertList DESTINATION bin/)
+# SET_PROPERTY(TARGET i23dSFM_main_ConvertList PROPERTY FOLDER I23dSFM/software)
+# INSTALL(TARGETS i23dSFM_main_ConvertList DESTINATION bin/)
 
 
-ADD_EXECUTABLE(i23dSFM_main_Calibration main_Calibration.cpp )
-TARGET_LINK_LIBRARIES(i23dSFM_main_Calibration
-        i23dSFM_system
-        i23dSFM_features
-        i23dSFM_sfm
-        i23dSFM_image
-        )
+# ADD_EXECUTABLE(i23dSFM_main_Calibration main_Calibration.cpp )
+# TARGET_LINK_LIBRARIES(i23dSFM_main_Calibration
+#         i23dSFM_system
+#         i23dSFM_features
+#         i23dSFM_sfm
+#         i23dSFM_image
+#         )
 
 
-SET_PROPERTY(TARGET i23dSFM_main_ConvertList PROPERTY FOLDER I23dSFM/software)
-INSTALL(TARGETS i23dSFM_main_ConvertList DESTINATION bin/)
+# SET_PROPERTY(TARGET i23dSFM_main_ConvertList PROPERTY FOLDER I23dSFM/software)
+# INSTALL(TARGETS i23dSFM_main_ConvertList DESTINATION bin/)
 
 ###
 # Add executable that computes:

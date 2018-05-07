@@ -31,9 +31,10 @@ import time
 #     sys.exit(1)
 
 input_dir = sys.argv[1]
-output_dir = sys.argv[2]
+segmentation_dir = sys.argv[2]
+output_dir = sys.argv[3]
 host= "@I23DSFM_SOFTWARE_SFM_BUILD_DIR@"+"/../software/SfM/hosts.txt"
-gms=sys.argv[3]
+gms=sys.argv[4]
 mpi=1
 times=8
 matches_dir = os.path.join(output_dir, "matches")
@@ -56,7 +57,8 @@ flog=open(file_path,'w')
 flog.write("before intrinsics analysis \t\t" + time.asctime(time.localtime(time.time())) + '\n')
 print ("\033[31m step 1 : before intrinsics analysis\033[00m " + time.asctime(time.localtime(time.time())))
 
-pIntrisics = subprocess.Popen( [os.path.join(I23DSFM_SFM_BIN, "i23dSFM_main_SfMInit_ImageListing"), "-e","1", "-i", input_dir, "-g","1","-o", matches_dir, "-d", camera_file_params] )
+# pIntrisics = subprocess.Popen( [os.path.join(I23DSFM_SFM_BIN, "i23dSFM_main_SfMInit_ImageListing"), "-e","1", "-i", input_dir, "-g","1","-o", matches_dir, "-d", camera_file_params] )
+pIntrisics = subprocess.Popen( [os.path.join(I23DSFM_SFM_BIN, "i23dSFM_main_SfMInit_ImageListing"), "-e","1", "-i", input_dir, "-s", segmentation_dir, "-g","1","-o", matches_dir, "-d", camera_file_params] )
 pIntrisics.wait()
 
 

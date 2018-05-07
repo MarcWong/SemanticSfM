@@ -32,15 +32,15 @@ struct View
   IndexT ui_width, ui_height;
 
   // Constructor (use unique index for the view_id)
-  View(
-    const std::string & sImgPath = "",
-    IndexT view_id = UndefinedIndexT,
-    IndexT intrinsic_id = UndefinedIndexT,
-    IndexT pose_id = UndefinedIndexT,
-    IndexT width = UndefinedIndexT, IndexT height = UndefinedIndexT)
-    :s_Img_path(sImgPath), id_view(view_id), id_intrinsic(intrinsic_id),
-    id_pose(pose_id), ui_width(width), ui_height(height)
-    {}
+  // View(
+  //   const std::string & sImgPath = "",
+  //   IndexT view_id = UndefinedIndexT,
+  //   IndexT intrinsic_id = UndefinedIndexT,
+  //   IndexT pose_id = UndefinedIndexT,
+  //   IndexT width = UndefinedIndexT, IndexT height = UndefinedIndexT)
+  //   :s_Img_path(sImgPath), id_view(view_id), id_intrinsic(intrinsic_id),
+  //   id_pose(pose_id), ui_width(width), ui_height(height)
+  //   {}
 
     View(
     const std::string & sImgPath = "",

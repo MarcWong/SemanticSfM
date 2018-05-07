@@ -78,6 +78,7 @@ int main(int argc, char **argv)
     CmdLine cmd;
 
     std::string sImageDir,
+            sSemanticImgDir = "",
             sfileDatabase = "",
             sOutputDir = "",
             sKmatrix;
@@ -91,6 +92,7 @@ int main(int argc, char **argv)
     double focal_pixels = -1.0;
 
     cmd.add( make_option('i', sImageDir, "imageDirectory") );
+    cmd.add( make_option('s', sSemanticImgDir, "semantic segmentation image directory") );  // added by chenyu
     cmd.add( make_option('d', sfileDatabase, "sensorWidthDatabase") );
     cmd.add( make_option('o', sOutputDir, "outputDirectory") );
     cmd.add( make_option('f', focal_pixels, "focal") );
@@ -105,6 +107,7 @@ int main(int argc, char **argv)
     } catch(const std::string& s) {
         std::cerr << "Usage: " << argv[0] << '\n'
                   << "[-i|--imageDirectory]\n"
+                  << "[-s|--semantic segmentation image directory]\n"
                   << "[-d|--sensorWidthDatabase]\n"
                   << "[-o|--outputDirectory]\n"
                   << "[-f|--focal] (pixels)\n"
@@ -127,6 +130,7 @@ int main(int argc, char **argv)
     std::cout << " You called : " <<std::endl
               << argv[0] << std::endl
               << "--imageDirectory " << sImageDir << std::endl
+              << "--semantic segmentation image directory" << sSemanticImgDir << std::endl
               << "--sensorWidthDatabase " << sfileDatabase << std::endl
               << "--outputDirectory " << sOutputDir << std::endl
               << "--focal " << focal_pixels << std::endl
@@ -144,6 +148,11 @@ int main(int argc, char **argv)
     {
         std::cerr << "\nThe input directory doesn't exist" << std::endl;
         return EXIT_FAILURE;
+    }
+
+    if( !stlplus::folder_exists( sSemanticImgDir ) )
+    {
+        std::cerr << "\nThe input semantic segmentation directory doesn't exist" << std::endl;
     }
 
     if (sOutputDir.empty())
@@ -186,12 +195,41 @@ int main(int argc, char **argv)
         }
     }
 
+    // extract an array of filenames (not paths) of all the files found in the specified folder.
+    // each of these names can be combined with folder and form _filespec() to give the 
+    // filespec of each file.
+    // More details: see http://stlplus.sourceforge.net/stlplus3/docs/file_system.html
+    // added by chenyu    
     std::vector<std::string> vec_image = stlplus::folder_files( sImageDir );
     std::sort(vec_image.begin(), vec_image.end());
+
+    // extract an array of filenames (not paths) of all the files found in the specified folder.
+    // each of these names can be combined with folder and form _filespec() to give the 
+    // filespec of each file.
+    // More details: see http://stlplus.sourceforge.net/stlplus3/docs/file_system.html\
+    // added by chenyu
+    std::vector<std::string> vec_semantic_image = stlplus::folder_files( sSemanticImgDir);
+    std::sort(vec_semantic_image.begin(), vec_semantic_image.end());
+
+    // check if each image has a corresponding semantic segmentation image
+    if(vec_image.size() != vec_semantic_image.size())
+    {
+            cerr << "images don't have a same size with semantic segmentation image" << endl;
+            return EXIT_FAILURE;
+    }
+    for(int i = 0; i < vec_image.size(); i++)
+    {
+        if(stlplus::basename_part(vec_image[i]) != stlplus::basename_part(vec_semantic_image[i]))
+        {
+            cerr << vec_image[i] << "doesn't have a corresponding semantic segmentation image" << endl;
+            return EXIT_FAILURE;
+        }
+    }
 
     // Configure an empty scene with Views and their corresponding cameras
     SfM_Data sfm_data;
     sfm_data.s_root_path = sImageDir; // Setup main image root_path
+    sfm_data.s_seg_root_path = sSemanticImgDir; // Setup semantic image root_path
     Views & views = sfm_data.views;
     Intrinsics & intrinsics = sfm_data.intrinsics;
     std::vector<Vec3> gpsInfo;
@@ -199,9 +237,10 @@ int main(int argc, char **argv)
     C_Progress_display my_progress_bar( vec_image.size(),
                                         std::cout, "\n- Image listing -\n" );
     std::ostringstream error_report_stream;
+    int k = 0;
     for ( std::vector<std::string>::const_iterator iter_image = vec_image.begin();
           iter_image != vec_image.end();
-          ++iter_image, ++my_progress_bar )
+          ++iter_image, ++my_progress_bar, ++k )
     {
         // Read meta data to fill camera parameter (w,h,focal,ppx,ppy) fields.
         width = height = ppx = ppy = focal = -1.0;
@@ -323,7 +362,9 @@ int main(int argc, char **argv)
         }
 
         // Build the view corresponding to the image
-        View v(*iter_image, views.size(), views.size(), views.size(), width, height);
+        // View v(*iter_image, views.size(), views.size(), views.size(), width, height);
+        // v.semantic_img_path = vec_semantic_image[k];
+        View v(*iter_image, vec_semantic_image[k], views.size(), views.size(), views.size(), width, height);
 
         // Add intrinsic related to the image (if any)
         if (intrinsic == NULL)

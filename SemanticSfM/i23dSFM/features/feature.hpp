@@ -26,8 +26,8 @@ class PointFeature {
 public:
   virtual inline ~PointFeature() {};
 
-  inline PointFeature(float x=0.0f, float y=0.0f)
-   : _coords(x, y) {}
+  // inline PointFeature(float x=0.0f, float y=0.0f)
+  //  : _coords(x, y) {}
 
   inline PointFeature(float x=0.0f, float y=0.0f, int sl = -1)
    : _coords(x, y), _semanticLabel(sl) {}
@@ -79,16 +79,15 @@ class SIOPointFeature : public PointFeature {
 public:
   virtual ~SIOPointFeature() {};
 
-  SIOPointFeature(float x=0.0f, float y=0.0f,
-                  float scale=0.0f, float orient=0.0f)
-    : PointFeature(x,y)
-    , _scale(scale)
-    , _orientation(orient) {}
+  // SIOPointFeature(float x=0.0f, float y=0.0f,
+  //                 float scale=0.0f, float orient=0.0f)
+  //   : PointFeature(x,y)
+  //   , _scale(scale)
+  //   , _orientation(orient) {}
 
   SIOPointFeature(float x=0.0f, float y=0.0f, int sl = -1,
                   float scale=0.0f, float orient=0.0f)
-    : PointFeature(x,y)
-    , _semanticLabel(sl)
+    : PointFeature(x,y,sl)
     , _scale(scale)
     , _orientation(orient) {}
 

@@ -197,6 +197,104 @@ public:
     return true;
   };
 
+
+  /**
+  @brief Detect regions on the image and compute their attributes (description)
+  @param image Image.
+  @param semantic_image Semantic image.
+  @param regions The detected regions and attributes (the caller must delete the allocated data)
+  @param mask 8-bit gray image for keypoint filtering (optional).
+     Non-zero values depict the region of interest.
+  */
+  bool Describe( const image::Image<unsigned char>& image,
+                          const image::Image<unsigned char> & semantic_image,
+                          std::unique_ptr<Regions> &regions,
+                          const image::Image<unsigned char> * mask = NULL)
+  {
+    const int w = image.Width(), h = image.Height();
+    //Convert to float
+    const image::Image<float> If(image.GetMat().cast<float>());
+    const image::Image<int> sif(semantic_image.GetMat().cast<int>());
+
+    // Configure VLFeat
+    vl_constructor();
+
+    VlSiftFilt *filt = vl_sift_new(w, h,
+      _params._num_octaves, _params._num_scales, _params._first_octave);
+    if (_params._edge_threshold >= 0)
+      vl_sift_set_edge_thresh(filt, _params._edge_threshold);
+    if (_params._peak_threshold >= 0)
+      vl_sift_set_peak_thresh(filt, 255*_params._peak_threshold/_params._num_scales);
+
+    Descriptor<vl_sift_pix, 128> descr;
+    Descriptor<unsigned char, 128> descriptor;
+
+    // Process SIFT computation
+    vl_sift_process_first_octave(filt, If.data());
+
+    Allocate(regions);
+
+    // Build alias to cached data
+    SIFT_Regions * regionsCasted = dynamic_cast<SIFT_Regions*>(regions.get());
+    // reserve some memory for faster keypoint saving
+    regionsCasted->Features().reserve(2000);
+    regionsCasted->Descriptors().reserve(2000);
+
+    while (true) {
+      vl_sift_detect(filt);
+
+      VlSiftKeypoint const *keys  = vl_sift_get_keypoints(filt);
+      const int nkeys = vl_sift_get_nkeypoints(filt);
+
+      // Update gradient before launching parallel extraction
+      vl_sift_update_gradient(filt);
+
+      #ifdef I23DSFM_USE_OPENMP
+      #pragma omp parallel for private(descr, descriptor)
+      #endif
+      for (int i = 0; i < nkeys; ++i) {
+
+        // Feature masking
+        if (mask)
+        {
+          const image::Image<unsigned char> & maskIma = *mask;
+          if (maskIma(keys[i].y, keys[i].x) == 0)
+            continue;
+        }
+
+        double angles [4] = {0.0, 0.0, 0.0, 0.0};
+        int nangles = 1; // by default (1 upright feature)
+        if (_bOrientation)
+        { // compute from 1 to 4 orientations
+          nangles = vl_sift_calc_keypoint_orientations(filt, angles, keys+i);
+        }
+
+        for (int q=0 ; q < nangles ; ++q) {
+          vl_sift_calc_keypoint_descriptor(filt, &descr[0], keys+i, angles[q]);
+          // const SIOPointFeature fp(keys[i].x, keys[i].y, keys[i].sigma, static_cast<float>(angles[q]));
+          const SIOPointFeature fp(keys[i].x, keys[i].y, semantic_image(keys[i].y, keys[i].x), keys[i].sigma, static_cast<float>(angles[q]));          
+
+          siftDescToUChar(&descr[0], descriptor, _params._root_sift);
+          #ifdef I23DSFM_USE_OPENMP
+          #pragma omp critical
+          #endif
+          {
+            regionsCasted->Descriptors().push_back(descriptor);
+            regionsCasted->Features().push_back(fp);
+          }
+        }
+      }
+      if (vl_sift_process_next_octave(filt))
+        break; // Last octave
+    }
+    vl_sift_delete(filt);
+
+    vl_destructor();
+
+    return true;
+  };
+
+
   /// Allocate Regions type depending of the Image_describer
   void Allocate(std::unique_ptr<Regions> &regions) const
   {

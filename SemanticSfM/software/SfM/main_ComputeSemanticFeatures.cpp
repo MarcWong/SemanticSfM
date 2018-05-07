@@ -54,7 +54,6 @@ int main(int argc, char **argv)
   CmdLine cmd;
 
   std::string sSfM_Data_Filename;
-  std::string semantic_filename;
   std::string sOutDir = "";
   bool bUpRight = false;
   std::string sImage_Describer_Method = "SIFT";
@@ -63,7 +62,6 @@ int main(int argc, char **argv)
 
   // required
   cmd.add( make_option('i', sSfM_Data_Filename, "input_file") );
-  cmd.add( make_option('s', semantic_filename, "semantic_file"));
   cmd.add( make_option('o', sOutDir, "outdir") );
   // Optional
   cmd.add( make_option('m', sImage_Describer_Method, "describerMethod") );
@@ -100,7 +98,6 @@ int main(int argc, char **argv)
   std::cout << " You called : " <<std::endl
             << argv[0] << std::endl
             << "--input_file " << sSfM_Data_Filename << std::endl
-            << "--semantic_file " << semantic_filename << std::endl
             << "--outdir " << sOutDir << std::endl
             << "--describerMethod " << sImage_Describer_Method << std::endl
             << "--upright " << bUpRight << std::endl
@@ -133,11 +130,6 @@ int main(int argc, char **argv)
     return false;
   }
 
-// if (!Load(sfm_data, semantic_filename, ESfM_Data(VIEWS|INTRINSICS))) {
-//     std::cerr << std::endl
-//       << "The input file \""<< semantic_filename << "\" cannot be read" << std::endl;
-//     return false;
-//   }
 
   // b. Init the image_describer
   // - retrieve the used one in case of pre-computed features
@@ -170,21 +162,9 @@ int main(int argc, char **argv)
   {
     // Create the desired Image_describer method.
     // Don't use a factory, perform direct allocation
-    if (sImage_Describer_Method == "SIFT")
-    {
-      image_describer.reset(new SIFT_Image_describer(SiftParams(), !bUpRight));
-    }
-    else
-    if (sImage_Describer_Method == "AKAZE_FLOAT")
-    {
-      image_describer.reset(new AKAZE_Image_describer(AKAZEParams(AKAZEConfig(), AKAZE_MSURF), !bUpRight));
-    }
-    else
-    if (sImage_Describer_Method == "AKAZE_MLDB")
-    {
-      image_describer.reset(new AKAZE_Image_describer(AKAZEParams(AKAZEConfig(), AKAZE_MLDB), !bUpRight));
-    }
-    //image_describer.reset(new AKAZE_Image_describer(AKAZEParams(AKAZEConfig(), AKAZE_LIOP), !bUpRight));
+    image_describer.reset(new SIFT_Image_describer(SiftParams(), !bUpRight));
+
+  
     if (!image_describer)
     {
       std::cerr << "Cannot create the designed Image_describer:"
@@ -222,7 +202,7 @@ int main(int argc, char **argv)
   // - if no file, compute features
   {
     system::Timer timer;
-    Image<unsigned char> imageGray, maskGray;
+    Image<unsigned char> imageGray, maskGray, semanticImgGray;
     C_Progress_display my_progress_bar( sfm_data.GetViews().size(),
       std::cout, "\n- EXTRACT FEATURES -\n" );
     for(Views::const_iterator iterViews = sfm_data.views.begin();
@@ -232,7 +212,7 @@ int main(int argc, char **argv)
       const View * view = iterViews->second.get();
       const std::string sView_filename = stlplus::create_filespec(sfm_data.s_root_path,
         view->s_Img_path);
-      const std::string sView_semantic_filename = stlplus::create_filespec(sfm_data.s_root_path,
+      const std::string sView_semantic_filename = stlplus::create_filespec(sfm_data.s_seg_root_path,
         view->semantic_img_path);
       const std::string sFeat = stlplus::create_filespec(sOutDir,
         stlplus::basename_part(sView_filename), "feat");
@@ -244,25 +224,28 @@ int main(int argc, char **argv)
       //If features or descriptors file are missing, compute them
       if (bForce || !stlplus::file_exists(sFeat) || !stlplus::file_exists(sDesc))
       {
-        if (!ReadImage(sView_filename.c_str(), &imageGray))
-          continue;
+        // if (!ReadImage(sView_filename.c_str(), &imageGray))
+        //   continue;
+        if (!(ReadImage(sView_filename.c_str(), &imageGray) || ReadImage(sView_semantic_filename.c_str(), &semanticImgGray)) )
+              continue;
 
         // Compute features and descriptors and export them to files
         std::unique_ptr<Regions> regions;
         if (!stlplus::file_exists(sMask_filename))
         {
           //std::cout << "No mask file for : " << sView_filename << std::endl;
-          image_describer->Describe(imageGray, regions);
+          // image_describer->Describe(imageGray, regions);          
+          image_describer->Describe(imageGray, semanticImgGray, regions);
         }
         else
         {
           ReadImage(sMask_filename.c_str(), &maskGray);
           //std::cout << "Read mask successfully : " << sMask_filename << std::endl;
-          image_describer->Describe(imageGray, regions, &maskGray);
+          // image_describer->Describe(imageGray, regions, &maskGray);          
+          image_describer->Describe(imageGray, semanticImgGray, regions, &maskGray);
         }
-
         // load semantic label of features
-        image_describer->LoadSemanticLabel(regions, semantic_img_path);
+        // image_describer->LoadSemanticLabel(regions, semantic_img_path);
         
         image_describer->Save(regions.get(), sFeat, sDesc);
       }

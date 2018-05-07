@@ -45,6 +45,8 @@ struct SfM_Data
 
   /// Root Views path
   std::string s_root_path;
+  /// Root Semantic Segmentation Path
+  std::string s_seg_root_path;
 
   //--
   // Accessors

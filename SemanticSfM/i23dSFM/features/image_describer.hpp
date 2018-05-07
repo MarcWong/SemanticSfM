@@ -44,19 +44,24 @@ public:
   @param mask 8-bit gray image for keypoint filtering (optional).
      Non-zero values depict the region of interest.
   */
-  virtual bool Describe(const image::Image<unsigned char> & image,
-    std::unique_ptr<Regions> &regions,
-    const image::Image<unsigned char> * mask = NULL) = 0;
+  virtual bool Describe( const image::Image<unsigned char> & image,
+                                      std::unique_ptr<Regions> &regions,
+                                      const image::Image<unsigned char> * mask = NULL) = 0;
+
+  virtual bool Describe( const image::Image<unsigned char> & image,
+                                      const image::Image<unsigned char> & semantic_image,
+                                      std::unique_ptr<Regions> &regions,
+                                      const image::Image<unsigned char> * mask = NULL) = 0;
 
   /// Allocate regions depending of the Image_describer
   virtual void Allocate(std::unique_ptr<Regions> &regions) const = 0;
 
 
   // Load semantic label of features
-  virtual bool LoadSemanticLabel(Regions * regions, const std::string& semantic_img_path)
-  {
-    return regions->LoadSemanticLabel(semantic_img_path);
-  }
+  // virtual bool LoadSemanticLabel(Regions * regions, const std::string& semantic_img_path)
+  // {
+  //   return regions->LoadSemanticLabel(semantic_img_path);
+  // }
 
 
   //--
