@@ -62,8 +62,14 @@ struct View
       stlplus::folder_part(s_Img_path));
     std::string filename = stlplus::filename_part(s_Img_path);
 
+    std::string semantic_local_path = stlplus::folder_append_separator(
+      stlplus::folder_part(semantic_img_path));
+    std::string semantic_filename = stlplus::filename_part(semantic_img_path);
+
     ar(cereal::make_nvp("local_path", local_path),
        cereal::make_nvp("filename", filename),
+       cereal::make_nvp("semantic_local_path", semantic_local_path),
+       cereal::make_nvp("semantic_filename", semantic_filename),
        cereal::make_nvp("width", ui_width),
        cereal::make_nvp("height", ui_height),
        cereal::make_nvp("id_view", id_view),
@@ -71,6 +77,7 @@ struct View
        cereal::make_nvp("id_pose", id_pose));
 
     s_Img_path = stlplus::create_filespec(local_path, filename);
+    semantic_img_path = stlplus::create_filespec(semantic_local_path, semantic_filename);
   }
 };
 

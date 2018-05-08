@@ -220,14 +220,19 @@ int main(int argc, char **argv)
         stlplus::basename_part(sView_filename), "desc");
       const std::string sMask_filename = stlplus::create_filespec(sfm_data.s_root_path + "mask/",
         stlplus::basename_part(sView_filename), "msk");
-
+      // cout << "image name: " << sView_filename << endl;
+      // cout << "semantic segmentation image name: " << sView_semantic_filename << endl;
       //If features or descriptors file are missing, compute them
       if (bForce || !stlplus::file_exists(sFeat) || !stlplus::file_exists(sDesc))
       {
         // if (!ReadImage(sView_filename.c_str(), &imageGray))
         //   continue;
-        if (!(ReadImage(sView_filename.c_str(), &imageGray) || ReadImage(sView_semantic_filename.c_str(), &semanticImgGray)) )
+        if (!ReadImage(sView_filename.c_str(), &imageGray) )
               continue;
+        if (!ReadImage(sView_semantic_filename.c_str(), &semanticImgGray) )
+        {
+          cout << "cannot read semantic segmentation file: " << sView_semantic_filename << endl;
+        }
 
         // Compute features and descriptors and export them to files
         std::unique_ptr<Regions> regions;

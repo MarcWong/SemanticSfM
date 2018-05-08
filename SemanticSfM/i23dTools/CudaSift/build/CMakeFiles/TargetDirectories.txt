@@ -1,2 +1,0 @@
-/home/gaomz/CudaSift-Maxwell/build/CMakeFiles/cudasift.dir
-/home/gaomz/CudaSift-Maxwell/build/CMakeFiles/extractsift.dir

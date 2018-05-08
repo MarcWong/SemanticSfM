@@ -206,12 +206,14 @@ public:
   @param mask 8-bit gray image for keypoint filtering (optional).
      Non-zero values depict the region of interest.
   */
-  bool Describe( const image::Image<unsigned char>& image,
-                          const image::Image<unsigned char> & semantic_image,
-                          std::unique_ptr<Regions> &regions,
-                          const image::Image<unsigned char> * mask = NULL)
+  bool Describe(const image::Image<unsigned char>& image,
+                const image::Image<unsigned char>& semantic_image,
+                std::unique_ptr<Regions> &regions,
+                const image::Image<unsigned char> * mask = NULL)
   {
     const int w = image.Width(), h = image.Height();
+    cout << "image's width&height: " << w << ", " << h << endl;
+    cout << "semantic segmentation image's width&height: " << semantic_image.Width() << ", " << semantic_image.Height() << endl;
     //Convert to float
     const image::Image<float> If(image.GetMat().cast<float>());
     const image::Image<int> sif(semantic_image.GetMat().cast<int>());
@@ -272,6 +274,8 @@ public:
         for (int q=0 ; q < nangles ; ++q) {
           vl_sift_calc_keypoint_descriptor(filt, &descr[0], keys+i, angles[q]);
           // const SIOPointFeature fp(keys[i].x, keys[i].y, keys[i].sigma, static_cast<float>(angles[q]));
+          // cout << keys[i].x << ", " << keys[i].y << endl << endl;
+          // cout << semantic_image(keys[i].y, keys[i].x) << endl;
           const SIOPointFeature fp(keys[i].x, keys[i].y, semantic_image(keys[i].y, keys[i].x), keys[i].sigma, static_cast<float>(angles[q]));          
 
           siftDescToUChar(&descr[0], descriptor, _params._root_sift);

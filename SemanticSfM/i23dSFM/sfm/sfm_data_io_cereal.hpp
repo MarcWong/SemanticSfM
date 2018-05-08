@@ -57,6 +57,7 @@ bool Load_Cereal(
     std::string version;
     archive(cereal::make_nvp("sfm_data_version", version));
     archive(cereal::make_nvp("root_path", data.s_root_path));
+    archive(cereal::make_nvp("semantic_root_path", data.s_seg_root_path));    
 
     if (b_views)
       archive(cereal::make_nvp("views", data.views));
@@ -138,6 +139,7 @@ bool Save_Cereal(
     const std::string version = "0.2";
     archive(cereal::make_nvp("sfm_data_version", version));
     archive(cereal::make_nvp("root_path", data.s_root_path));
+    archive(cereal::make_nvp("semantic_root_path", data.s_seg_root_path));    
 
     if (b_views)
       archive(cereal::make_nvp("views", data.views));

@@ -130,7 +130,7 @@ int main(int argc, char **argv)
     std::cout << " You called : " <<std::endl
               << argv[0] << std::endl
               << "--imageDirectory " << sImageDir << std::endl
-              << "--semantic segmentation image directory" << sSemanticImgDir << std::endl
+              << "--semantic segmentation image directory " << sSemanticImgDir << std::endl
               << "--sensorWidthDatabase " << sfileDatabase << std::endl
               << "--outputDirectory " << sOutputDir << std::endl
               << "--focal " << focal_pixels << std::endl

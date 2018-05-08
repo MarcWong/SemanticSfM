@@ -1,4 +1,0 @@
-MeshSimplification original.obj new.obj targetNum
-
-g++ -std=c++11 main.cpp Mesh.cpp Feature.cpp Simplify.cpp MxHeap.cxx BilateralNormalFilter.cpp -o debug
-
