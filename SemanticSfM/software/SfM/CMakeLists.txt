@@ -169,6 +169,7 @@ TARGET_LINK_LIBRARIES(i23dSFM_main_FrustumFiltering
 ADD_EXECUTABLE(i23dSFM_main_ComputeStructureFromKnownPoses main_ComputeStructureFromKnownPoses.cpp)
 TARGET_LINK_LIBRARIES(i23dSFM_main_ComputeStructureFromKnownPoses
   i23dSFM_system
+  i23dSFM_image  
   i23dSFM_features
   i23dSFM_sfm
   stlplus
@@ -176,6 +177,15 @@ TARGET_LINK_LIBRARIES(i23dSFM_main_ComputeStructureFromKnownPoses
 
 ADD_EXECUTABLE(i23dSFM_main_ComputeSfM_DataColor main_ComputeSfM_DataColor.cpp)
 TARGET_LINK_LIBRARIES(i23dSFM_main_ComputeSfM_DataColor
+  i23dSFM_system
+  i23dSFM_image
+  i23dSFM_features
+  i23dSFM_sfm
+  stlplus
+  )
+
+ADD_EXECUTABLE(i23dSFM_main_ComputeSfM_SemanticDataColor main_ComputeSfM_SemanticDataColor.cpp)
+TARGET_LINK_LIBRARIES(i23dSFM_main_ComputeSfM_SemanticDataColor
   i23dSFM_system
   i23dSFM_image
   i23dSFM_features

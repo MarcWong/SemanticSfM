@@ -44,11 +44,13 @@ struct Observation
 /// Observations are indexed by their View_id
 typedef Hash_Map<IndexT, Observation> Observations;
 
+
 /// Define a landmark (a 3D point, with it's 2d observations)
 struct Landmark
 {
   Observations obs;
   Vec3 X;
+  int semantic_label = -1;
 
   // Serialization
   template <class Archive>
@@ -57,6 +59,7 @@ struct Landmark
     const std::vector<double> point = { X(0), X(1), X(2) };
     ar(cereal::make_nvp("X", point ));
     ar(cereal::make_nvp("observations", obs));
+    ar(cereal::make_nvp("semantic_label", semantic_label));    
   }
 
   template <class Archive>
@@ -66,6 +69,7 @@ struct Landmark
     ar(cereal::make_nvp("X", point ));
     X = Eigen::Map<const Vec3>(&point[0]);
     ar(cereal::make_nvp("observations", obs));
+    ar(cereal::make_nvp("semantic_label", semantic_label));    
   }
 };
 

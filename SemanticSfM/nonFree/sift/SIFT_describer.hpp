@@ -212,8 +212,8 @@ public:
                 const image::Image<unsigned char> * mask = NULL)
   {
     const int w = image.Width(), h = image.Height();
-    cout << "image's width&height: " << w << ", " << h << endl;
-    cout << "semantic segmentation image's width&height: " << semantic_image.Width() << ", " << semantic_image.Height() << endl;
+    // cout << "image's width&height: " << w << ", " << h << endl;
+    // cout << "semantic segmentation image's width&height: " << semantic_image.Width() << ", " << semantic_image.Height() << endl;
     //Convert to float
     const image::Image<float> If(image.GetMat().cast<float>());
     const image::Image<int> sif(semantic_image.GetMat().cast<int>());

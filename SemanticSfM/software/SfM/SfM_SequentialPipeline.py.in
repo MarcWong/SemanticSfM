@@ -125,7 +125,8 @@ pRecons.wait()
 
 print ("\033[31m step 5 : before colorize structure\033[00m " + time.asctime(time.localtime(time.time())))
 flog.write("before colorize structure \t\t" + time.asctime(time.localtime(time.time())) + '\n')
-pRecons = subprocess.Popen( [os.path.join(I23DSFM_SFM_BIN, "i23dSFM_main_ComputeSfM_DataColor"),  "-i", reconstruction_dir+"/sfm_data.json", "-o", os.path.join(reconstruction_dir,"colorized.ply")] )
+# pRecons = subprocess.Popen( [os.path.join(I23DSFM_SFM_BIN, "i23dSFM_main_ComputeSfM_DataColor"),  "-i", reconstruction_dir+"/sfm_data.json", "-o", os.path.join(reconstruction_dir,"colorized.ply")] )
+pRecons = subprocess.Popen( [os.path.join(I23DSFM_SFM_BIN, "i23dSFM_main_ComputeSfM_SemanticDataColor"),  "-i", reconstruction_dir+"/sfm_data.json", "-o", os.path.join(reconstruction_dir,"colorized.ply")] )
 pRecons.wait()
 
 # optional, compute final valid structure from the known camera poses
@@ -136,7 +137,8 @@ pRecons.wait()
 
 print ("\033[31m step 7 : before write ply files\033[00m " + time.asctime(time.localtime(time.time())))
 flog.write("before write ply files \t\t\t" + time.asctime(time.localtime(time.time())) + '\n')
-pRecons = subprocess.Popen( [os.path.join(I23DSFM_SFM_BIN, "i23dSFM_main_ComputeSfM_DataColor"),  "-i", reconstruction_dir+"/robust.json", "-o", os.path.join(reconstruction_dir,"robust_colorized.ply"), "-p", os.path.join(reconstruction_dir,"photo_align.ply"), "-m", reconstruction_dir] )
+# pRecons = subprocess.Popen( [os.path.join(I23DSFM_SFM_BIN, "i23dSFM_main_ComputeSfM_DataColor"),  "-i", reconstruction_dir+"/robust.json", "-o", os.path.join(reconstruction_dir,"robust_colorized.ply"), "-p", os.path.join(reconstruction_dir,"photo_align.ply"), "-m", reconstruction_dir] )
+pRecons = subprocess.Popen( [os.path.join(I23DSFM_SFM_BIN, "i23dSFM_main_ComputeSfM_SemanticDataColor"),  "-i", reconstruction_dir+"/robust.json", "-o", os.path.join(reconstruction_dir,"robust_colorized.ply"), "-p", os.path.join(reconstruction_dir,"photo_align.ply"), "-m", reconstruction_dir] )
 pRecons.wait()
 
 print ("\033[31m finish time\033[00m " + time.asctime(time.localtime(time.time())))

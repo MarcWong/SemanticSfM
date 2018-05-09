@@ -930,6 +930,7 @@ bool SequentialSfMReconstructionEngine::Resection(const size_t viewIndex)
     }
   }
 
+
   // C. Do the resectioning: compute the camera pose.
   std::cout << std::endl
     << "-------------------------------" << std::endl
@@ -1167,6 +1168,7 @@ bool SequentialSfMReconstructionEngine::Resection(const size_t viewIndex)
                 // Add a new track
                 Landmark & landmark = _sfm_data.structure[trackId];
                 landmark.X = X_euclidean;
+                // landmark.semantic_label = 
                 landmark.obs[I] = Observation(xI, track.at(I));
                 landmark.obs[J] = Observation(xJ, track.at(J));
                 ++new_added_track;

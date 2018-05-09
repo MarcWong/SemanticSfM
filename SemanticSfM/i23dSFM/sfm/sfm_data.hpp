@@ -25,6 +25,7 @@ typedef Hash_Map<IndexT, geometry::Pose3> Poses;
 /// Define a collection of IntrinsicParameter (indexed by View::id_intrinsic)
 typedef Hash_Map<IndexT, std::shared_ptr<cameras::IntrinsicBase> > Intrinsics;
 
+
 /// Define a collection of landmarks are indexed by their TrackId
 typedef Hash_Map<IndexT, Landmark> Landmarks;
 

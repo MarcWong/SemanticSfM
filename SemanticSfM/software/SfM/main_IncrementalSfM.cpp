@@ -7,6 +7,8 @@
 
 #include <cstdlib>
 
+#include "i23dSFM/image/image.hpp"
+
 #include "i23dSFM/sfm/sfm.hpp"
 #include "i23dSFM/system/timer.hpp"
 
@@ -16,6 +18,7 @@
 #define FOCAL_DIFF_THRESHOLD 0.04
 
 using namespace i23dSFM;
+using namespace i23dSFM::image;
 using namespace i23dSFM::cameras;
 using namespace i23dSFM::sfm;
 
@@ -223,8 +226,14 @@ int main(int argc, char **argv)
   if(bRepeatFocal && (intrinsicError > FOCAL_DIFF_THRESHOLD))
       continue;
 
+
+  
+
   if (sfmEngineProcess)
   {
+    // cout << "begin extract feature label, there are " << sfmEngine.Get_SfM_Data().GetLandmarks().size() << " 3d feature points" << endl;
+    // sfmEngine.Extract_Feature_Label();
+
     std::cout << std::endl << " Total Ac-Sfm took (s): " << timer.elapsed() << std::endl;
 
     std::cout << "...Generating SfM_Report.html" << std::endl;
@@ -242,6 +251,10 @@ int main(int argc, char **argv)
       ESfM_Data(ALL));
 
     return EXIT_SUCCESS;
+  }
+  else
+  {
+    cout << "sfmEngineProcess died..." << endl;
   }
   }
   return EXIT_FAILURE;
