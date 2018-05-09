@@ -55,6 +55,7 @@ static void PointsToMat(
   }
 }
 
+
 /// Use geometry of the views to compute a putative structure from features and descriptors.
 void SfM_Data_Structure_Estimation_From_Known_Poses::run(
   SfM_Data & sfm_data,
@@ -264,18 +265,19 @@ void SfM_Data_Structure_Estimation_From_Known_Poses::triangulate(
   Landmarks & structure = sfm_data.structure;
   IndexT idx(0);
   for (tracks::STLMAPTracks::const_iterator itTracks = map_tracksCommon.begin();
-    itTracks != map_tracksCommon.end();
-    ++itTracks, ++idx)
+       itTracks != map_tracksCommon.end(); ++itTracks, ++idx)
   {
     const tracks::submapTrack & track = itTracks->second;
     structure[idx] = Landmark();
     Observations & obs = structure.at(idx).obs;
+    int & semantic_label = structure.at(idx).semantic_label;
     for (tracks::submapTrack::const_iterator it = track.begin(); it != track.end(); ++it)
     {
       const size_t imaIndex = it->first;
       const size_t featIndex = it->second;
       const Vec2 pt = regions_provider->regions_per_view.at(imaIndex)->GetRegionPosition(featIndex);
       obs[imaIndex] = Observation(pt, featIndex);
+      semantic_label = regions_provider->regions_per_view.at(imaIndex)->GetRegionsPositionLabel(featIndex);
     }
   }
 

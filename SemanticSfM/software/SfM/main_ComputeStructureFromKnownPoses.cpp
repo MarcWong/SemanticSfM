@@ -123,28 +123,30 @@ int main(int argc, char **argv)
   structure_estimator.run(sfm_data, pairs, regions_provider);
   RemoveOutliers_AngleError(sfm_data, 2.0);
 
-    Hash_Map<IndexT, Landmark>::iterator ite;
-    for(ite = sfm_data.structure.begin(); ite != sfm_data.structure.end(); ite++)
-    {
-      Observations obs = ite->second.obs;
-      Hash_Map<IndexT, Observation>::iterator obsIte = obs.begin();
-      IndexT viewId = obsIte->first;
-      Vec2 feat_coord = obsIte->second.x;
-      // load semantic images
-      string semantic_img_path;
+    // extract semantic label
+    // Hash_Map<IndexT, Landmark>::iterator ite;
+    // for(ite = sfm_data.structure.begin(); ite != sfm_data.structure.end(); ite++)
+    // {
+    //   Observations obs = ite->second.obs;
+    //   Hash_Map<IndexT, Observation>::iterator obsIte = obs.begin();
+    //   IndexT viewId = obsIte->first;
+    //   Vec2 feat_coord = obsIte->second.x;
+    //   // load semantic images
+    //   string semantic_img_path;
 
-      std::shared_ptr<View> fView = sfm_data.views.find(viewId)->second;
-      semantic_img_path = sfm_data.s_seg_root_path + fView->semantic_img_path;
+    //   // std::shared_ptr<View> fView = sfm_data.views.find(viewId)->second;
+    //   View* fView = sfm_data.GetViews().at(viewId).get();
+    //   semantic_img_path = sfm_data.s_seg_root_path + fView->semantic_img_path;
 
-      Image<unsigned char> semanticImgGray;
-      if(!ReadImage(semantic_img_path.c_str(), &semanticImgGray))
-      {
-        cout << "cannot read semantic segmentation file: " << semantic_img_path << endl;      
-        return 0;
-      }
-      ite->second.semantic_label = semanticImgGray(feat_coord[1], feat_coord[0]);
-      cout << "semantic label: " << ite->second.semantic_label << endl;
-    }
+    //   Image<unsigned char> semanticImgGray;
+    //   if(!ReadImage(semantic_img_path.c_str(), &semanticImgGray))
+    //   {
+    //     cout << "cannot read semantic segmentation file: " << semantic_img_path << endl;      
+    //     return 0;
+    //   }
+    //   ite->second.semantic_label = semanticImgGray(feat_coord[1], feat_coord[0]);
+    //   cout << "semantic label: " << ite->second.semantic_label << endl;
+    // }
 
   std::cout << "\nStructure estimation took (s): " << timer.elapsed() << "." << std::endl;
 

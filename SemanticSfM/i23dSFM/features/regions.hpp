@@ -56,6 +56,7 @@ public:
 
   //-- Assume that a region can always be represented at least by a 2D positions
   virtual PointFeatures GetRegionsPositions() const = 0;
+  virtual int GetRegionsPositionLabel(size_t i) const = 0;
   virtual Vec2 GetRegionPosition(size_t i) const = 0;
 
   /// Return the number of defined regions
@@ -137,6 +138,11 @@ public:
   Vec2 GetRegionPosition(size_t i) const
   {
     return Vec2f(_vec_feats[i].coords()).cast<double>();
+  }
+
+  int GetRegionsPositionLabel(size_t i) const
+  {
+    return _vec_feats[i].semanticLabel();
   }
 
   /// Return the number of defined regions
@@ -252,6 +258,12 @@ public:
   {
     return Vec2f(_vec_feats[i].coords()).cast<double>();
   }
+
+  int GetRegionsPositionLabel(size_t i) const
+  {
+    return _vec_feats[i].semanticLabel();
+  }
+
 
   /// Return the number of defined regions
   size_t RegionCount() const {return _vec_feats.size();}

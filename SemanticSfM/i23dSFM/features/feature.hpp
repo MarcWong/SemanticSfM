@@ -42,7 +42,7 @@ public:
   inline Vec2f& coords() { return _coords;}
 
   virtual inline std::ostream& print(std::ostream& os) const
-  { return os << _coords(0) << " " << _coords(1) << _semanticLabel; }
+  { return os << _coords(0) << " " << _coords(1) << " " << _semanticLabel; }
 
   virtual inline std::istream& read(std::istream& in)
   { return in >> _coords(0) >> _coords(1) >> _semanticLabel; }

@@ -583,6 +583,8 @@ bool SequentialSfMReconstructionEngine::MakeInitialPair3D(const Pair & current_p
       obs[view_J->id_view] = Observation(x2_, j);
       landmarks[iterT->first].obs = std::move(obs);
       landmarks[iterT->first].X = X;
+      landmarks[iterT->first].semantic_label = _features_provider->feats_per_view[I][i].semanticLabel();
+      // cout << "semantic label is: " << landmarks[iterT->first].semantic_label << endl;
     }
     Save(tiny_scene, stlplus::create_filespec(_sOutDirectory, "initialPair.ply"), ESfM_Data(ALL));
 
@@ -1168,7 +1170,7 @@ bool SequentialSfMReconstructionEngine::Resection(const size_t viewIndex)
                 // Add a new track
                 Landmark & landmark = _sfm_data.structure[trackId];
                 landmark.X = X_euclidean;
-                // landmark.semantic_label = 
+                landmark.semantic_label = _features_provider->feats_per_view.at(I)[track.at(I)].semanticLabel(); 
                 landmark.obs[I] = Observation(xI, track.at(I));
                 landmark.obs[J] = Observation(xJ, track.at(J));
                 ++new_added_track;

@@ -128,7 +128,7 @@ bool ColorizeSemanticTracks(
           const RGBColor color = b_rgb_image ? image_rgb(pt.y(), pt.x()) : RGBColor(image_gray(pt.y(), pt.x()));
           int idx = trackIds_to_contiguousIndexes[trackId];
           // vec_tracksColor[ trackIds_to_contiguousIndexes[trackId] ] = Vec3(color.r(), color.g(), color.b());
-          cout << "semantic label is[in extract feature color]: " << vec_semanticLabel[idx] << endl;
+          // cout << "semantic label is[in extract feature color]: " << vec_semanticLabel[idx] << endl;
           if(vec_semanticLabel[idx] == 0) vec_tracksColor[idx] = Vec3(255, 0, 0);
           else if(vec_semanticLabel[idx] == 1) vec_tracksColor[idx] = Vec3(0, 255, 0);
           else if(vec_semanticLabel[idx] == 2) vec_tracksColor[idx] = Vec3(0, 0, 255);
