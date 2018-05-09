@@ -13,6 +13,9 @@
 #include "third_party/stlplus3/filesystemSimplified/file_system.hpp"
 #include "third_party/progress/progress.hpp"
 
+
+// #define USE_SEMANTIC_LABEL 0
+
 namespace i23dSFM {
 namespace matching_image_collection {
 
@@ -95,9 +98,9 @@ void Match
   }
 
   // Index the input regions
-#ifdef I23DSFM_USE_OPENMP
-  #pragma omp parallel for schedule(dynamic)
-#endif
+  #ifdef I23DSFM_USE_OPENMP
+    #pragma omp parallel for schedule(dynamic)
+  #endif
   for (int i =0; i < used_index.size(); ++i)
   {
     std::set<IndexT>::const_iterator iter = used_index.begin();
@@ -111,17 +114,16 @@ void Match
     Eigen::Map<BaseMat> mat_I( (ScalarT*)tabI, regionsI.RegionCount(), dimension);
     const HashedDescriptions hashed_description = cascade_hasher.CreateHashedDescriptions(mat_I,
       zero_mean_descriptor);
-#ifdef I23DSFM_USE_OPENMP
-    #pragma omp critical
-#endif
+    #ifdef I23DSFM_USE_OPENMP
+        #pragma omp critical
+    #endif
     {
       hashed_base_[I] = std::move(hashed_description);
     }
   }
 
   // Perform matching between all the pairs
-  for (Map_vectorT::const_iterator iter = map_Pairs.begin();
-    iter != map_Pairs.end(); ++iter)
+  for (Map_vectorT::const_iterator iter = map_Pairs.begin(); iter != map_Pairs.end(); ++iter)
   {
     const IndexT I = iter->first;
     const std::vector<IndexT> & indexToCompare = iter->second;
@@ -134,14 +136,13 @@ void Match
     }
 
     const std::vector<features::PointFeature> pointFeaturesI = regionsI.GetRegionsPositions();
-    const ScalarT * tabI =
-      reinterpret_cast<const ScalarT*>(regionsI.DescriptorRawData());
+    const ScalarT * tabI = reinterpret_cast<const ScalarT*>(regionsI.DescriptorRawData());
     const size_t dimension = regionsI.DescriptorLength();
     Eigen::Map<BaseMat> mat_I( (ScalarT*)tabI, regionsI.RegionCount(), dimension);
 
-#ifdef I23DSFM_USE_OPENMP
-    #pragma omp parallel for schedule(dynamic)
-#endif
+    #ifdef I23DSFM_USE_OPENMP
+        #pragma omp parallel for schedule(dynamic)
+    #endif
     for (int j = 0; j < (int)indexToCompare.size(); ++j)
     {
       const size_t J = indexToCompare[j];
@@ -150,9 +151,9 @@ void Match
       if (regions_provider.regions_per_view.count(J) == 0
           || regionsI.Type_id() != regionsJ.Type_id())
       {
-#ifdef I23DSFM_USE_OPENMP
-        #pragma omp critical
-#endif
+        #ifdef I23DSFM_USE_OPENMP
+                #pragma omp critical
+        #endif
         ++my_progress_bar;
         continue;
       }
@@ -167,11 +168,19 @@ void Match
       pvec_distances.reserve(regionsJ.RegionCount() * 2);
       pvec_indices.reserve(regionsJ.RegionCount() * 2);
 
+      #ifdef USE_SEMANTIC_LABEL
       // Match the query descriptors to the database
+      cascade_hasher.Match_Semantic_HashedDescriptions<BaseMat, ResultType>(
+        hashed_base_[J], mat_J,
+        hashed_base_[I], mat_I,
+        regionsI, regionsJ,
+        &pvec_indices, &pvec_distances);
+      #else
       cascade_hasher.Match_HashedDescriptions<BaseMat, ResultType>(
         hashed_base_[J], mat_J,
         hashed_base_[I], mat_I,
         &pvec_indices, &pvec_distances);
+      #endif
 
       std::vector<int> vec_nn_ratio_idx;
       // Filter the matches using a distance ratio test:
@@ -216,6 +225,7 @@ void Match
   }
 }
 } // namespace impl
+
 
 void Cascade_Hashing_Matcher_Regions_AllInMemory::Match
 (

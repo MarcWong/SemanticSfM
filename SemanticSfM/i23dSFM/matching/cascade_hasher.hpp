@@ -65,6 +65,8 @@
 #include <random>
 #include <cmath>
 
+#define USE_SEMANTIC_LABEL 1 // added by chenyu
+
 namespace i23dSFM {
 namespace matching {
 
@@ -319,6 +321,148 @@ public:
       {
         continue;
       }
+
+      // Skip matching this descriptor if the corresponding features don't have
+      // the same semantic label
+      // if()
+      // {
+      //   continue;
+      // }
+
+
+      // Compute the hamming distance of all candidates based on the comp hash
+      // code. Put the descriptors into buckets corresponding to their hamming
+      // distance.
+      for (const int candidate_id : candidate_descriptors)
+      {
+        if (!used_descriptor[candidate_id]) // avoid selecting the same candidate multiple times
+        {
+          used_descriptor[candidate_id] = true;
+
+          const HammingMetricType::ResultType hamming_distance = metricH(
+            hashed_desc.hash_code.data(),
+            hashed_descriptions2.hashed_desc[candidate_id].hash_code.data(),
+            hashed_desc.hash_code.num_blocks());
+          candidate_hamming_distances(
+              num_descriptors_with_hamming_distance(hamming_distance)++,
+              hamming_distance) = candidate_id;
+        }
+      }
+
+      // Compute the euclidean distance of the k descriptors with the best hamming
+      // distance.
+      candidate_euclidean_distances.reserve(kNumTopCandidates);
+      for (int j = 0; j < candidate_hamming_distances.cols() &&
+        (candidate_euclidean_distances.size() < kNumTopCandidates); ++j)
+      {
+        for(int k = 0; k < num_descriptors_with_hamming_distance(j) &&
+          (candidate_euclidean_distances.size() < kNumTopCandidates); ++k)
+        {
+          const int candidate_id = candidate_hamming_distances(k, j);
+          const DistanceType distance = metric(
+            descriptions2.row(candidate_id).data(),
+            descriptions1.row(i).data(),
+            descriptions1.cols());
+
+          candidate_euclidean_distances.emplace_back(distance, candidate_id);
+        }
+      }
+
+      // Assert that each query is having at least NN retrieved neighbors
+      if (candidate_euclidean_distances.size() >= NN)
+      {
+        // Find the top NN candidates based on euclidean distance.
+        std::partial_sort(candidate_euclidean_distances.begin(),
+          candidate_euclidean_distances.begin() + NN,
+          candidate_euclidean_distances.end());
+        // save resulting neighbors
+        for (int l = 0; l < NN; ++l)
+        {
+          pvec_distances->emplace_back(candidate_euclidean_distances[l].first);
+          pvec_indices->emplace_back(IndMatch(i,candidate_euclidean_distances[l].second));
+        }
+      }
+      //else -> too few candidates... (save no one)
+    }
+  }
+
+
+    // Matches two collection of hashed descriptions with a fast matching scheme
+  // based on the hash codes previously generated.
+  template <typename MatrixT, typename DistanceType>
+  void Match_Semantic_HashedDescriptions
+  (
+    const HashedDescriptions& hashed_descriptions1,
+    const MatrixT & descriptions1,
+    const HashedDescriptions& hashed_descriptions2,
+    const MatrixT & descriptions2,
+    features::Regions regionsI,   
+    features::Regions regionsJ,     
+    IndMatches * pvec_indices,
+    std::vector<DistanceType> * pvec_distances,
+    const int NN = 2
+  ) const
+  {
+    typedef L2_Vectorized<typename MatrixT::Scalar> MetricT;
+    MetricT metric;
+
+    static const int kNumTopCandidates = 10;
+
+    // Preallocate the candidate descriptors container.
+    std::vector<int> candidate_descriptors;
+    candidate_descriptors.reserve(hashed_descriptions2.hashed_desc.size());
+
+    // Preallocated hamming distances. Each column indicates the hamming distance
+    // and the rows collect the descriptor ids with that
+    // distance. num_descriptors_with_hamming_distance keeps track of how many
+    // descriptors have that distance.
+    Eigen::MatrixXi candidate_hamming_distances(
+      hashed_descriptions2.hashed_desc.size(), nb_hash_code_ + 1);
+    Eigen::VectorXi num_descriptors_with_hamming_distance(nb_hash_code_ + 1);
+
+    // Preallocate the container for keeping euclidean distances.
+    std::vector<std::pair<DistanceType, int> > candidate_euclidean_distances;
+    candidate_euclidean_distances.reserve(kNumTopCandidates);
+
+    // A preallocated vector to determine if we have already used a particular
+    // feature for matching (i.e., prevents duplicates).
+    std::vector<bool> used_descriptor(hashed_descriptions2.hashed_desc.size());
+
+    typedef matching::Hamming<stl::dynamic_bitset::BlockType> HammingMetricType;
+    static const HammingMetricType metricH = {};
+    for (int i = 0; i < hashed_descriptions1.hashed_desc.size(); ++i)
+    {
+      candidate_descriptors.clear();
+      num_descriptors_with_hamming_distance.setZero();
+      candidate_euclidean_distances.clear();
+
+      const auto& hashed_desc = hashed_descriptions1.hashed_desc[i];
+
+      // Accumulate all descriptors in each bucket group that are in the same
+      // bucket id as the query descriptor.
+      for (int j = 0; j < nb_bucket_groups_; ++j)
+      {
+        const uint16_t bucket_id = hashed_desc.bucket_ids[j];
+        for (const auto& feature_id : hashed_descriptions2.buckets[j][bucket_id])
+        {
+          candidate_descriptors.emplace_back(feature_id);
+          used_descriptor[feature_id] = false;
+        }
+      }
+
+      // Skip matching this descriptor if there are not at least NN candidates.
+      if (candidate_descriptors.size() <= NN)
+      {
+        continue;
+      }
+
+      // Skip matching this descriptor if the corresponding features don't have
+      // the same semantic label
+      // if()
+      // {
+      //   continue;
+      // }
+
 
       // Compute the hamming distance of all candidates based on the comp hash
       // code. Put the descriptors into buckets corresponding to their hamming

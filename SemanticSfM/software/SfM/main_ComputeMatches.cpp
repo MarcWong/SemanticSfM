@@ -1,9 +1,3 @@
-
-
-// Copyright (c) 2012, 2013 Pierre MOULON.
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "i23dSFM/sfm/sfm_data.hpp"
 #include "i23dSFM/sfm/sfm_data_io.hpp"
 #include "i23dSFM/sfm/pipelines/sfm_engine.hpp"
@@ -251,7 +245,7 @@ int main(int argc, char **argv) {
         std::cout << "\t PREVIOUS RESULTS LOADED" << std::endl;
     }
 
-    //else // Compute the putative matches
+    // else, Compute the putative matches
     {
         std::cout << "Use: ";
 
@@ -454,32 +448,6 @@ int main(int argc, char **argv) {
 
             }
 
-/*			std::vector <PairWiseMatches::key_type> vec_toRemove;
-
-			for (PairWiseMatches::const_iterator iterMap = map_GeometricMatches.begin();
-				 iterMap != map_GeometricMatches.end(); ++iterMap)
-				{
-				const size_t	putativePhotometricCount = map_PutativesMatches.find(iterMap->first)->second.size();
-				const size_t	putativeGeometricCount = iterMap->second.size();
-				const float 	ratio = putativeGeometricCount / (float)
-
-				putativePhotometricCount;
-
-				if (putativeGeometricCount < 50 || ratio <.3f)
-					{
-					// the pair will be removed
-					vec_toRemove.push_back(iterMap->first);
-					}
-				}
-
-			//-- remove discarded pairs
-			for (std::vector <PairWiseMatches::key_type>::const_iterator iter = vec_toRemove.begin();
-				 iter != vec_toRemove.end(); ++iter)
-				{
-				map_GeometricMatches.erase(*iter);
-				}
-				*/
-
         }
 
         {
@@ -542,35 +510,6 @@ int main(int argc, char **argv) {
                     break;
             }
         }
-
-       
-
-
-//        //-- Perform an additional check to remove pairs with poor overlap
-//        std::vector<PairWiseMatches::key_type> vec_toRemove;
-//
-//        for (PairWiseMatches::const_iterator iterMap = map_GeometricMatches.begin();
-//             iterMap != map_GeometricMatches.end(); ++iterMap) {
-//            cout << iterMap->first.first << "-" << iterMap->first.second << ":"
-//                 << map_PutativesMatches[iterMap->first].size() << "->" << iterMap->second.size() << endl;
-//
-//            const size_t putativePhotometricCount = map_PutativesMatches.find(iterMap->first)->second.size();
-//            const size_t putativeGeometricCount = iterMap->second.size();
-//            const float ratio = putativeGeometricCount / (float)
-//
-//                    putativePhotometricCount;
-//
-//            if (putativeGeometricCount < 50 || ratio < .3f) {
-//                // the pair will be removed
-//                vec_toRemove.push_back(iterMap->first);
-//            }
-//        }
-//
-//        //-- remove discarded pairs
-//        for (std::vector<PairWiseMatches::key_type>::const_iterator iter = vec_toRemove.begin();
-//             iter != vec_toRemove.end(); ++iter) {
-//            map_GeometricMatches.erase(*iter);
-//        }
 
 
 
