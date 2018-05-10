@@ -219,6 +219,8 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
     PairWiseMatches map_PutativesMatches;
+    PairWiseMatches map_SemanticMatches;
+    
 
     // Build some alias from SfM_Data Views data:
     // - List views as a vector of filenames & image sizes
@@ -328,6 +330,28 @@ int main(int argc, char **argv) {
             }
 
             collectionMatcher->Match(sfm_data, regions_provider, pairs, map_PutativesMatches);
+            
+
+            for(auto pairedIndMatch : map_PutativesMatches)
+            {
+                auto p = pairedIndMatch.first;
+                auto landmarks_i = feats_provider->getFeatures(p.first);
+                auto landmarks_j = feats_provider->getFeatures(p.second);
+                auto indMatches = pairedIndMatch.second;
+                
+                IndMatches iMatches;
+                for(auto imIte = indMatches.begin(); imIte != indMatches.end(); imIte++)
+                {
+                    if(landmarks_i[imIte->_i].semanticLabel() == landmarks_j[imIte->_j].semanticLabel())
+                    {
+                        // indMatches.erase(imIte++);
+                        iMatches.push_back(matching::IndMatch(imIte->_i, imIte->_j));
+                    }
+                }
+                map_SemanticMatches[p] = iMatches;
+            }
+
+
 
             //---------------------------------------
             //-- Export putative matches
@@ -335,7 +359,10 @@ int main(int argc, char **argv) {
             std::ofstream file(std::string(sMatchesDirectory + "/matches.putative.txt").c_str());
 
             if (file.is_open())
-                PairedIndMatchToStream(map_PutativesMatches, file);
+            {
+                // PairedIndMatchToStream(map_PutativesMatches, file);
+                PairedIndMatchToStream(map_SemanticMatches, file);
+            }
 
             file.close();
         }
@@ -344,7 +371,8 @@ int main(int argc, char **argv) {
 
     //-- export putative matches Adjacency matrix
     PairWiseMatchingToAdjacencyMatrixSVG(vec_fileNames.size(),
-                                         map_PutativesMatches,
+                                        //  map_PutativesMatches,
+                                        map_SemanticMatches,
                                          stlplus::create_filespec(sMatchesDirectory, "PutativeAdjacencyMatrix", "svg"));
 
     //-- export view pair graph once putative graph matches have been computed
@@ -352,7 +380,8 @@ int main(int argc, char **argv) {
         std::set<IndexT> set_ViewIds;
         std::transform(sfm_data.GetViews().begin(), sfm_data.GetViews().end(),
                        std::inserter(set_ViewIds, set_ViewIds.begin()), stl::RetrieveKey());
-        graph::indexedGraph putativeGraph(set_ViewIds, getPairs(map_PutativesMatches));
+        // graph::indexedGraph putativeGraph(set_ViewIds, getPairs(map_PutativesMatches));
+        graph::indexedGraph putativeGraph(set_ViewIds, getPairs(map_SemanticMatches));        
         graph::exportToGraphvizData(stlplus::create_filespec(sMatchesDirectory, "putative_matches"),
                                     putativeGraph.g);
     }
@@ -386,8 +415,10 @@ int main(int argc, char **argv) {
 #pragma omp     parallel for schedule(dynamic)
 #endif
 
-            for (int pi = 0; pi < map_PutativesMatches.size(); ++pi) {
-                PairWiseMatches::const_iterator iter = map_PutativesMatches.begin();
+            // for (int pi = 0; pi < map_PutativesMatches.size(); ++pi) {
+            //     PairWiseMatches::const_iterator iter = map_PutativesMatches.begin();
+            for (int pi = 0; pi < map_SemanticMatches.size(); ++pi) {
+                PairWiseMatches::const_iterator iter = map_SemanticMatches.begin();
                 std::advance(iter, pi);
 
                 auto p = *iter;
@@ -452,7 +483,8 @@ int main(int argc, char **argv) {
 
         {
             if(gms){
-                map_PutativesMatches = map_GeometricMatches;
+                // map_PutativesMatches = map_GeometricMatches;
+                map_SemanticMatches = map_GeometricMatches;                
                 map_GeometricMatches.clear();
 
             }
@@ -468,7 +500,9 @@ int main(int argc, char **argv) {
                     const bool bGeometric_only_guided_matching = true;
 
                     filter_ptr->Robust_model_estimation(GeometricFilter_HMatrix_AC(4.0, imax_iteration),
-                                                        map_PutativesMatches, bGuided_matching,
+                                                        // map_PutativesMatches, 
+                                                        map_SemanticMatches,                                                         
+                                                        bGuided_matching,
                                                         bGeometric_only_guided_matching ? -1.0 : 0.6);
                     map_GeometricMatches = filter_ptr->Get_geometric_matches();
 
@@ -477,21 +511,27 @@ int main(int argc, char **argv) {
 
                 case FUNDAMENTAL_MATRIX: {
                     filter_ptr->Robust_model_estimation(GeometricFilter_FMatrix_AC(4.0, imax_iteration),
-                                                        map_PutativesMatches, bGuided_matching);
+                                                        // map_PutativesMatches, 
+                                                        map_SemanticMatches,
+                                                        bGuided_matching);
                     map_GeometricMatches = filter_ptr->Get_geometric_matches();
                 }
                     break;
 
                 case ESSENTIAL_MATRIX: {
                     filter_ptr->Robust_model_estimation(GeometricFilter_EMatrix_AC(4.0, imax_iteration),
-                                                        map_PutativesMatches, bGuided_matching);
+                                                        // map_PutativesMatches, 
+                                                        map_SemanticMatches,
+                                                        bGuided_matching);
                     map_GeometricMatches = filter_ptr->Get_geometric_matches();
 
                     //-- Perform an additional check to remove pairs with poor overlap
                     std::vector<PairWiseMatches::key_type> vec_toRemove;
                     for (PairWiseMatches::const_iterator iterMap = map_GeometricMatches.begin();
                          iterMap != map_GeometricMatches.end(); ++iterMap) {
-                        const size_t putativePhotometricCount = map_PutativesMatches.find(
+                        // const size_t putativePhotometricCount = map_PutativesMatches.find(
+                        //         iterMap->first)->second.size();
+                        const size_t putativePhotometricCount = map_SemanticMatches.find(
                                 iterMap->first)->second.size();
                         const size_t putativeGeometricCount = iterMap->second.size();
                         const float ratio = putativeGeometricCount / (float) putativePhotometricCount;
