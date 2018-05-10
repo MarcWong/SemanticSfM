@@ -14,7 +14,7 @@
 #include "third_party/progress/progress.hpp"
 
 
-#define USE_SEMANTIC_LABEL
+// #define USE_SEMANTIC_LABEL
 
 namespace i23dSFM {
 namespace matching_image_collection {
@@ -140,7 +140,7 @@ void Match
     const size_t dimension = regionsI.DescriptorLength();
     Eigen::Map<BaseMat> mat_I( (ScalarT*)tabI, regionsI.RegionCount(), dimension);
 
-    #ifdef USE_SEMANTIC_LABEL
+    // #ifdef USE_SEMANTIC_LABEL
     // Group descriptor by semantic label of corresponding features
     vector<ScalarT> tabI0, tabI1, tabI2;
     for(int i = 0; i < pointFeaturesI.size(); i++)
@@ -150,14 +150,11 @@ void Match
       else tabI2.push_back(tabI[i]);
     }
 
-    // cout << "mapping to left image: " << endl;
-
     Eigen::Map<BaseMat> mat_I0(&tabI0[0], tabI0.size(), dimension);
     Eigen::Map<BaseMat> mat_I1(&tabI1[0], tabI1.size(), dimension);
     Eigen::Map<BaseMat> mat_I2(&tabI2[0], tabI2.size(), dimension);
     
-    // cout << "ending of map to left image" << endl;
-    #endif
+    // #endif
 
     #ifdef I23DSFM_USE_OPENMP
         #pragma omp parallel for schedule(dynamic)
@@ -182,7 +179,7 @@ void Match
       const ScalarT * tabJ = reinterpret_cast<const ScalarT*>(regionsJ.DescriptorRawData());    
       Eigen::Map<BaseMat> mat_J( (ScalarT*)tabJ, regionsJ.RegionCount(), dimension);
 
-       #ifdef USE_SEMANTIC_LABEL
+       // #ifdef USE_SEMANTIC_LABEL
       // Group descriptor by semantic label of corresponding features
       vector<ScalarT> tabJ0, tabJ1, tabJ2;
       for(int i = 0; i < pointFeaturesJ.size(); i++)
@@ -192,15 +189,9 @@ void Match
         else tabJ2.push_back(tabJ[i]);
       }
 
-      // cout << "mapping to right image" << endl;
-
       Eigen::Map<BaseMat> mat_J0(&tabJ0[0], tabJ0.size(), dimension);
-      Eigen::Map<BaseMat> mat_J1(&tabJ1[0], tabJ1.size(), dimension);
-      Eigen::Map<BaseMat> mat_J2(&tabJ2[0], tabJ2.size(), dimension);
-
-      // cout << "end of map to right image" << endl;
-      #endif
-
+      Eigen::Map<BaseMat> mat_J1(&tabJ1[0], tabJ0.size(), dimension);
+      Eigen::Map<BaseMat> mat_J2(&tabJ2[0], tabJ0.size(), dimension);
 
       typedef typename Accumulator<ScalarT>::Type ResultType;      
       matching::IndMatches vec_putative_matches;
@@ -208,14 +199,14 @@ void Match
 #ifdef USE_SEMANTIC_LABEL
       IndMatches pvec_indices0, pvec_indices1, pvec_indices2;
       std::vector<ResultType> pvec_distances0, pvec_distances1, pvec_distances2;
-      pvec_distances0.reserve(tabJ0.size() * 2);
-      pvec_distances1.reserve(tabJ1.size() * 2);
-      pvec_distances2.reserve(tabJ2.size() * 2);
-      pvec_indices0.reserve(tabJ0.size() * 2);
-      pvec_indices1.reserve(tabJ1.size() * 2);
-      pvec_indices2.reserve(tabJ2.size() * 2);
+      pvec_distances0.reserve(regionsJ.RegionCount() * 2);
+      pvec_distances1.reserve(regionsJ.RegionCount() * 2);
+      pvec_distances2.reserve(regionsJ.RegionCount() * 2);
+      pvec_indices0.reserve(regionsJ.RegionCount() * 2);
+      pvec_indices1.reserve(regionsJ.RegionCount() * 2);
+      pvec_indices2.reserve(regionsJ.RegionCount() * 2);
       
-      cout << "begin semantic cascade hashing matching" << endl;
+
       // Match the query descriptors to the database
       cascade_hasher.Match_HashedDescriptions<BaseMat, ResultType>(
         hashed_base_[J], mat_J0, hashed_base_[I], mat_I0, &pvec_indices0, &pvec_distances0);
@@ -223,7 +214,6 @@ void Match
         hashed_base_[J], mat_J1, hashed_base_[I], mat_I1, &pvec_indices1, &pvec_distances1);
       cascade_hasher.Match_HashedDescriptions<BaseMat, ResultType>(
         hashed_base_[J], mat_J2, hashed_base_[I], mat_I2, &pvec_indices2, &pvec_distances2);
-      cout << "end of semantic cascade hashing matching" << endl;
 
       std::vector<int> vec_nn_ratio_idx0, vec_nn_ratio_idx1, vec_nn_ratio_idx2;
       // Filter the matches using a distance ratio test:

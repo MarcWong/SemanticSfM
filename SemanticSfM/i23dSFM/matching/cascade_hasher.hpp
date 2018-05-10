@@ -278,6 +278,7 @@ public:
     std::vector<int> candidate_descriptors;
     candidate_descriptors.reserve(hashed_descriptions2.hashed_desc.size());
 
+    cout << "declaration of cadidate_hamming_distances" << endl;
     // Preallocated hamming distances. Each column indicates the hamming distance
     // and the rows collect the descriptor ids with that
     // distance. num_descriptors_with_hamming_distance keeps track of how many
@@ -285,6 +286,7 @@ public:
     Eigen::MatrixXi candidate_hamming_distances(
       hashed_descriptions2.hashed_desc.size(), nb_hash_code_ + 1);
     Eigen::VectorXi num_descriptors_with_hamming_distance(nb_hash_code_ + 1);
+cout << "end of declaration of candidate_euclidean_distances" << endl;
 
     // Preallocate the container for keeping euclidean distances.
     std::vector<std::pair<DistanceType, int> > candidate_euclidean_distances;
@@ -293,6 +295,8 @@ public:
     // A preallocated vector to determine if we have already used a particular
     // feature for matching (i.e., prevents duplicates).
     std::vector<bool> used_descriptor(hashed_descriptions2.hashed_desc.size());
+
+    cout << "declaration of HammingMetricType" << endl;
 
     typedef matching::Hamming<stl::dynamic_bitset::BlockType> HammingMetricType;
     static const HammingMetricType metricH = {};
