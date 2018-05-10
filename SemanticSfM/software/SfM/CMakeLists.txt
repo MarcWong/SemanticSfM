@@ -141,14 +141,6 @@ TARGET_LINK_LIBRARIES(i23dSFM_main_IncrementalSfM
   stlplus
   )
 
-# ADD_EXECUTABLE(i23dSFM_main_GlobalSfM main_GlobalSfM.cpp)
-# TARGET_LINK_LIBRARIES(i23dSFM_main_GlobalSfM
-#   i23dSFM_system
-#   i23dSFM_image
-#   i23dSFM_features
-#   i23dSFM_sfm
-#   stlplus
-#   )
 
 ADD_EXECUTABLE(i23dSFM_main_ConvertSfM_DataFormat main_ConvertSfM_DataFormat.cpp)
 TARGET_LINK_LIBRARIES(i23dSFM_main_ConvertSfM_DataFormat
@@ -205,8 +197,6 @@ TARGET_LINK_LIBRARIES(i23dSFM_main_ComputeSfM_PhotoColor
 # Installation rules
 SET_PROPERTY(TARGET i23dSFM_main_IncrementalSfM PROPERTY FOLDER I23dSFM/software)
 INSTALL(TARGETS i23dSFM_main_IncrementalSfM DESTINATION bin/)
-# SET_PROPERTY(TARGET i23dSFM_main_GlobalSfM PROPERTY FOLDER I23dSFM/software)
-# INSTALL(TARGETS i23dSFM_main_GlobalSfM DESTINATION bin/)
 SET_PROPERTY(TARGET i23dSFM_main_ConvertSfM_DataFormat PROPERTY FOLDER I23dSFM/software)
 INSTALL(TARGETS i23dSFM_main_ConvertSfM_DataFormat DESTINATION bin/)
 SET_PROPERTY(TARGET i23dSFM_main_FrustumFiltering PROPERTY FOLDER I23dSFM/software)
@@ -413,13 +403,6 @@ ELSE()
   SET(I23DSFM_SOFTWARE_SFM_BUILD_DIR ${EXECUTABLE_OUTPUT_PATH})
 ENDIF()
 
-# SET(I23DSFM_TUTORIAL_IN_FILE "${CMAKE_CURRENT_LIST_DIR}/tutorial_demo.py.in")
-# CONFIGURE_FILE(${I23DSFM_TUTORIAL_IN_FILE}
-#     "${CMAKE_CURRENT_BINARY_DIR}/tutorial_demo.py" @ONLY)
-
-# SET(I23DSFM_TUTORIAL_IN_FILE "${CMAKE_CURRENT_LIST_DIR}/SfM_GlobalPipeline.py.in")
-# CONFIGURE_FILE(${I23DSFM_TUTORIAL_IN_FILE}
-#     "${CMAKE_CURRENT_BINARY_DIR}/SfM_GlobalPipeline.py" @ONLY)
 
 SET(I23DSFM_TUTORIAL_IN_FILE "${CMAKE_CURRENT_LIST_DIR}/SfM_SequentialPipeline.py.in")
 CONFIGURE_FILE(${I23DSFM_TUTORIAL_IN_FILE}
