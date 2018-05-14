@@ -128,6 +128,7 @@ bool SequentialSfMReconstructionEngine::Process() {
       _set_remainingViewId.erase(*iter);
     }
 
+
     if (bImageAdded)
     {
       // Scene logging as ply for visual debug

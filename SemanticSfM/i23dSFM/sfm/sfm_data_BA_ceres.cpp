@@ -186,8 +186,7 @@ bool Bundle_Adjustment_Ceres::Adjust(
   // TODO: make the LOSS function and the parameter an option
 
   // For all visibility add reprojections errors:
-  for (Landmarks::iterator iterTracks = sfm_data.structure.begin();
-    iterTracks!= sfm_data.structure.end(); ++iterTracks)
+  for (Landmarks::iterator iterTracks = sfm_data.structure.begin(); iterTracks!= sfm_data.structure.end(); ++iterTracks)
   {
     const Observations & obs = iterTracks->second.obs;
 
@@ -205,10 +204,10 @@ bool Bundle_Adjustment_Ceres::Adjust(
 
       if (cost_function)
         problem.AddResidualBlock(cost_function,
-          p_LossFunction,
-          &map_intrinsics[view->id_intrinsic][0],
-          &map_poses[view->id_pose][0],
-          iterTracks->second.X.data()); //Do we need to copy 3D point to avoid false motion, if failure ?
+                                 p_LossFunction,
+                                 &map_intrinsics[view->id_intrinsic][0],
+                                 &map_poses[view->id_pose][0],
+                                 iterTracks->second.X.data()); //Do we need to copy 3D point to avoid false motion, if failure ?
     }
     if (!bRefineStructure)
       problem.SetParameterBlockConstant(iterTracks->second.X.data());
