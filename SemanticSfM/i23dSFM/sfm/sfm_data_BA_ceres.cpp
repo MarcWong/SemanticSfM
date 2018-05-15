@@ -190,8 +190,7 @@ bool Bundle_Adjustment_Ceres::Adjust(
   {
     const Observations & obs = iterTracks->second.obs;
 
-    for (Observations::const_iterator itObs = obs.begin();
-      itObs != obs.end(); ++itObs)
+    for (Observations::const_iterator itObs = obs.begin(); itObs != obs.end(); ++itObs)
     {
       // Build the residual block corresponding to the track observation:
       const View * view = sfm_data.views.at(itObs->first).get();
@@ -286,6 +285,16 @@ bool Bundle_Adjustment_Ceres::Adjust(
     }
     return true;
   }
+}
+
+bool Bundle_Adjustment_Ceres::SemanticAdjust(
+  SfM_Data & sfm_data,     // the SfM scene to refine
+  bool bRefineRotations,   // tell if pose rotations will be refined
+  bool bRefineTranslations,// tell if the pose translation will be refined
+  bool bRefineIntrinsics,  // tell if the camera intrinsic will be refined
+  bool bRefineStructure)   // tell if the structure will be refined
+{
+  return true;
 }
 
 } // namespace sfm
