@@ -1,0 +1,31 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    script(src="./javascripts/jquery.min.js")
+    title 上传文件
+  body
+    h1 使用multer中间件上传文件
+    button(type="button", onclick='clean()')
+      | 清空文件
+    form(enctype='multipart/form-data', method='post', action='upload')
+      | 请选择文件：
+      input#file(type='file', name='file', multiple='')
+      br
+      input(type='submit', value='上传文件')
+    script(type='text/javascript').
+      function clean(){
+        //alert('clean')
+        $.ajax({
+          type: "POST",
+          url: "/clean",
+          dataType: "json",
+          success: function () {
+            alert('清空成功');
+          },
+
+          error: function () {
+            alert('清空失败');
+          }
+        });
+      }
