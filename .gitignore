@@ -1,3 +1,5 @@
 .vscode/*
 SemanticSfM/.idea/*
 SemanticSfM/build/*
+dlib_test/*
+matlab_test/build/*
