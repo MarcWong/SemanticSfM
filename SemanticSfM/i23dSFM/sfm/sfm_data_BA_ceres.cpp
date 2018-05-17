@@ -40,29 +40,34 @@ ceres::CostFunction * IntrinsicsToCostFunction(IntrinsicBase * intrinsic, const 
   }
 }
 
-mwArray SQP_FUN(IntrinsicBase* instrinsic, mwArrray X)
-{
-  switch(intrinsic->getType())
-  {
-    case PINHOLE_CAMERA:
-      return new ceres::AutoDiffCostFunction<ResidualErrorFunctor_Pinhole_Intrinsic, 2, 3, 6, 3>(
-        new ResidualErrorFunctor_Pinhole_Intrinsic(observation.data()));
-    break;
-    case PINHOLE_CAMERA_RADIAL1:
-      return new ceres::AutoDiffCostFunction<ResidualErrorFunctor_Pinhole_Intrinsic_Radial_K1, 2, 4, 6, 3>(
-        new ResidualErrorFunctor_Pinhole_Intrinsic_Radial_K1(observation.data()));
-    break;
-    case PINHOLE_CAMERA_RADIAL3:
-      return new ceres::AutoDiffCostFunction<ResidualErrorFunctor_Pinhole_Intrinsic_Radial_K3, 2, 6, 6, 3>(
-        new ResidualErrorFunctor_Pinhole_Intrinsic_Radial_K3(observation.data()));
-    break;
-    case PINHOLE_CAMERA_BROWN:
-      return new ceres::AutoDiffCostFunction<ResidualErrorFunctor_Pinhole_Intrinsic_Brown_T2, 2, 8, 6, 3>(
-        new ResidualErrorFunctor_Pinhole_Intrinsic_Brown_T2(observation.data()));
-    default:
-      return NULL;
-  }
-}
+// mwArray SQP_FUN(IntrinsicBase* instrinsic, mwArrray X)
+// {
+//   switch(intrinsic->getType())
+//   {
+//     case PINHOLE_CAMERA:
+//       return SQP_Pinhole_Intrinsic_FUN(X, cam_K, cam_Rt, pos_3dpoint);
+//     break;
+
+//     case PINHOLE_CAMERA_RADIAL1:
+//       return SQP_Pinhole_Intrinsic_Raidal_K1_FUN(X, cam_K, cam_Rt, pos_3dpoint);
+//     break;
+
+//     case PINHOLE_CAMERA_RADIAL3:
+//       return SQP_Pinhole_Intrinsic_Raidal_K3_FUN(X, cam_K, cam_Rt, pos_3dpoint);
+//     break;
+
+//     case PINHOLE_CAMERA_BROWN:
+//       return SQP_Pinhole_Intrinsic__Brown_T2_FUN(X, cam_K, cam_Rt, pos_3dpoint);
+//     break;
+//     default:
+//       return NULL;
+//   }
+// }
+
+// mwArray SQP_NONLCON(IntrinsicBase * intrinsic, mwArray X_LABEL)
+// {
+
+// }
 
 
 Bundle_Adjustment_Ceres::BA_options::BA_options(const bool bVerbose, bool bmultithreaded)
@@ -397,8 +402,11 @@ bool Bundle_Adjustment_Ceres::SemanticAdjust(
     }
   }
 
-  // eigen::MatrixXd eigen_X = eigen::MatarixXd::Zero(sfm_data.structure.size(), 2);
-  mwArray X(sfm_data.structure.size(), 2, mxDOUBLE_CLASS);
+  eigen::MatrixXd eigen_x = eigen::MatrixXd::Zero(sfm_data.structure.size(), 2);
+  eigen::MatrixXd eigen_X = eigen::MatrixXd::Zero(sfm_data.structure.size(), 3);
+  eigen::MatrixXd label_X = eigen::MatrixXd::Zero();
+  // mwArray X(sfm_data.structure.size(), 2, mxDOUBLE_CLASS);
+
   // For all visibility add reprojections errors:
   for (Landmarks::iterator iterTracks = sfm_data.structure.begin(); iterTracks!= sfm_data.structure.end(); ++iterTracks)
   {
@@ -413,8 +421,8 @@ bool Bundle_Adjustment_Ceres::SemanticAdjust(
       // image location and compares the reprojection against the observation.
       // ceres::CostFunction* cost_function =
       //   IntrinsicsToCostFunction(sfm_data.intrinsics[view->id_intrinsic].get(), itObs->second.x);
-      X(k, 0) = itObs->second.x[0];
-      X(k, 1) = itObs->second.x[1];
+      eigen_x(k, 0) = itObs->second.x[0];
+      eigen_x(k, 1) = itObs->second.x[1];
 
       // if (cost_function)
       //   problem.AddResidualBlock(cost_function,
@@ -425,26 +433,14 @@ bool Bundle_Adjustment_Ceres::SemanticAdjust(
     }
   }
 
-  // Configure a BA engine and run it
-  // //  Make Ceres automatically detect the bundle structure.
-  // ceres::Solver::Options options;
-  // options.preconditioner_type = _i23dSFM_options._preconditioner_type;
-  // options.linear_solver_type = _i23dSFM_options._linear_solver_type;
-  // options.sparse_linear_algebra_library_type = _i23dSFM_options._sparse_linear_algebra_library_type;
-  // options.minimizer_progress_to_stdout = false;
-  // options.logging_type = ceres::SILENT;
-  // options.num_threads = _i23dSFM_options._nbThreads;
-  // options.num_linear_solver_threads = _i23dSFM_options._nbThreads;
+  mwArray X = sfm::Eigen2Matlab(eigen_X);
 
-  // // Solve BA
-  // ceres::Solver::Summary summary;
-  // ceres::Solve(options, &problem, &summary);
-  // if (_i23dSFM_options._bCeres_Summary)
-  //   std::cout << summary.FullReport() << std::endl;
+  // Configure a BA engine and run it
   mwArray FVAL(1, 1, mxDOUBLE_CLASS);
   mwArray sqp_options();
   fmincon(2, X, FVAL, EXITFLAG, OUTPUT, LAMBDA, GRAD, HESSIEAN, 
           SQP_FUN, X_inl, [], [], [], [], [], [], SQP_NONLCON, sqp_options, []);
+
 
   // If no error, get back refined parameters
   if (!summary.IsSolutionUsable())

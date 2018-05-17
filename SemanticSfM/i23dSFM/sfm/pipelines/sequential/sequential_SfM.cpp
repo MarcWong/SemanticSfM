@@ -1210,8 +1210,8 @@ bool SequentialSfMReconstructionEngine::BundleAdjustment()
     options._linear_solver_type = ceres::DENSE_SCHUR;
   }
   Bundle_Adjustment_Ceres bundle_adjustment_obj(options);
-  // return bundle_adjustment_obj.Adjust(_sfm_data, true, true, !_bFixedIntrinsics);
-  return bundle_adjustment_obj.SemanticAdjust(_sfm_data, true, true, !_bFixedIntrinsics);
+  return bundle_adjustment_obj.Adjust(_sfm_data, true, true, !_bFixedIntrinsics);
+  // return bundle_adjustment_obj.SemanticAdjust(_sfm_data, true, true, !_bFixedIntrinsics);
 }
 
 /**

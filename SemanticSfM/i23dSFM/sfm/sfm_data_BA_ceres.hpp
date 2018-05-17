@@ -23,8 +23,8 @@ ceres::CostFunction * IntrinsicsToCostFunction(
   cameras::IntrinsicBase * intrinsic,
   const Vec2 & observation);
 
-  mwArray SQP_FUN(IntrinsicBase * intrinsic, mwARRAY X);
-  mwArray SQP_SQP_NONLCON(IntrinsicBase * intrinsic, mwARRAY X_LABEL);
+  // mwArray SQP_FUN(IntrinsicBase * intrinsic, mwARRAY X);
+  // mwArray SQP_NONLCON(IntrinsicBase * intrinsic, mwArray X_LABEL);
 
 class Bundle_Adjustment_Ceres : public Bundle_Adjustment
 {

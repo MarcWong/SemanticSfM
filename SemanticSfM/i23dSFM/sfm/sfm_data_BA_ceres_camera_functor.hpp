@@ -8,6 +8,7 @@
 #define I23DSFM_SFM_DATA_BA_CERES_CAMERA_FUNCTOR_HPP
 
 #include "i23dSFM/cameras/cameras.hpp"
+#include "i23dSFM/sfm/sfm_utility.hpp"
 #include "ceres/rotation.h"
 
 #include "sqp/include/cmlcpclass.h"
@@ -394,78 +395,239 @@ struct ResidualErrorFunctor_Pinhole_Intrinsic_Brown_T2
   double m_pos_2dpoint[2]; // The 2D observation
 };
 
-template <typename T>
-mwArray SQP_Pinhole_Intrinsic_FUN(mwArray X, 
-                                  const T* const cam_K,
-                                  const T* const cam_Rt,
-                                  const T* const pos_3dpoint)
-{
-  mwArray
-  for(auto i : rows)
-    // Apply external parameters (Pose)
-    const T * cam_R = cam_Rt;
-    const T * cam_t = &cam_Rt[3];
+// template <typename T>
+// mwArray SQP_Pinhole_Intrinsic_FUN(mwArray X, 
+//                                   const T* const cam_K,
+//                                   const T* const cam_Rt,
+//                                   const T* const pos_3dpoint)
+// {
+//   eigen::MatrixXd eigen_X = sfm::Matlab2Eigen(X);
+//   for(int i = 0; i < eigen_X.rows(); i++)
+//   {
+//     // Apply external parameters (Pose)
+//     const T * cam_R = cam_Rt;
+//     const T * cam_t = &cam_Rt[3];
 
-    T pos_proj[3];
-    // Rotate the point according the camera rotation
-    ceres::AngleAxisRotatePoint(cam_R, pos_3dpoint, pos_proj);
+//     T pos_proj[3];
+//     // Rotate the point according the camera rotation
+//     ceres::AngleAxisRotatePoint(cam_R, pos_3dpoint, pos_proj);
 
-    // Apply the camera translation
-    pos_proj[0] += cam_t[0];
-    pos_proj[1] += cam_t[1];
-    pos_proj[2] += cam_t[2];
+//     // Apply the camera translation
+//     pos_proj[0] += cam_t[0];
+//     pos_proj[1] += cam_t[1];
+//     pos_proj[2] += cam_t[2];
 
-    // Transform the point from homogeneous to euclidean (undistorted point)
-    const T x_u = pos_proj[0] / pos_proj[2];
-    const T y_u = pos_proj[1] / pos_proj[2];
+//     // Transform the point from homogeneous to euclidean (undistorted point)
+//     const T x_u = pos_proj[0] / pos_proj[2];
+//     const T y_u = pos_proj[1] / pos_proj[2];
 
-    //--
-    // Apply intrinsic parameters
-    //--
+//     // Apply intrinsic parameters
 
-    const T& focal = cam_K[OFFSET_FOCAL_LENGTH];
-    const T& principal_point_x = cam_K[OFFSET_PRINCIPAL_POINT_X];
-    const T& principal_point_y = cam_K[OFFSET_PRINCIPAL_POINT_Y];
+//     const T& focal = cam_K[OFFSET_FOCAL_LENGTH];
+//     const T& principal_point_x = cam_K[OFFSET_PRINCIPAL_POINT_X];
+//     const T& principal_point_y = cam_K[OFFSET_PRINCIPAL_POINT_Y];
 
-    // Apply focal length and principal point to get the final image coordinates
-    const T projected_x = principal_point_x + focal * x_u;
-    const T projected_y = principal_point_y + focal * y_u;
+//     // Apply focal length and principal point to get the final image coordinates
+//     const T projected_x = principal_point_x + focal * x_u;
+//     const T projected_y = principal_point_y + focal * y_u;
 
-    // Compute and return the error is the difference between the predicted
-    //  and observed position
-    out_residuals[0] = projected_x - T(m_pos_2dpoint[0]);
-    out_residuals[1] = projected_y - T(m_pos_2dpoint[1]);
-
-    return true;
+//     // Compute and return the error is the difference between the predicted
+//     //  and observed position
+//     out_residuals[0] = projected_x - T(eigen_X(i, 0));
+//     out_residuals[1] = projected_y - T(eigen_X(i, 1);
+//   }
   
-}
+// }
 
-template <typename T>
-mwArray SQP_Pinhole_Intrinsic_Raidal_K1_FUN(mwArray X
-                                            const T* const cam_K,
-                                            const T* const cam_Rt,
-                                            const T* const pos_3dpoint)
-{
+// template <typename T>
+// mwArray SQP_Pinhole_Intrinsic_Raidal_K1_FUN(mwArray X
+//                                             const T* const cam_K,
+//                                             const T* const cam_Rt,
+//                                             const T* const pos_3dpoint)
+// {
+//     // Enum to map intrinsics parameters between i23dSFM & ceres camera data parameter block.
+//   enum {
+//     OFFSET_FOCAL_LENGTH = 0,
+//     OFFSET_PRINCIPAL_POINT_X = 1,
+//     OFFSET_PRINCIPAL_POINT_Y = 2,
+//     OFFSET_DISTO_K1 = 3
+//   };
+//   eigen::MatrixXd eigen_X = sfm::Matlab2Eigen(X);
+//   for(int i = 0; i < eigen_X.rows(); i++)
+//   {
+//     // Apply external parameters (Pose)
+//     const T * cam_R = cam_Rt;
+//     const T * cam_t = &cam_Rt[3];
 
-}
+//     T pos_proj[3];
+//     // Rotate the point according the camera rotation
+//     ceres::AngleAxisRotatePoint(cam_R, pos_3dpoint, pos_proj);
 
-template <typename T>
-mwArray SQP_Pinhole_Intrinsic_Raidal_K3_FUN(mwArray X
-                                            const T* const cam_K,
-                                            const T* const cam_Rt,
-                                            const T* const pos_3dpoint)
-{
+//     // Apply the camera translation
+//     pos_proj[0] += cam_t[0];
+//     pos_proj[1] += cam_t[1];
+//     pos_proj[2] += cam_t[2];
 
-}
+//     // Transform the point from homogeneous to euclidean (undistorted point)
+//     const T x_u = pos_proj[0] / pos_proj[2];
+//     const T y_u = pos_proj[1] / pos_proj[2];
 
-template <typename T>
-mwArray SQP_Pinhole_Intrinsic__Brown_T2_FUN(mwArray X
-                                            const T* const cam_K,
-                                            const T* const cam_Rt,
-                                            const T* const pos_3dpoint)
-{
+//     // Apply intrinsic parameters
 
-}
+//     const T& focal = cam_K[OFFSET_FOCAL_LENGTH];
+//     const T& principal_point_x = cam_K[OFFSET_PRINCIPAL_POINT_X];
+//     const T& principal_point_y = cam_K[OFFSET_PRINCIPAL_POINT_Y];
+//     const T& k1 = cam_K[OFFSET_DISTO_K1];
+
+//     // Apply distortion (xd,yd) = disto(x_u,y_u)
+//     const T r2 = x_u*x_u + y_u*y_u;
+//     const T r_coeff = (T(1) + k1*r2);
+//     const T x_d = x_u * r_coeff;
+//     const T y_d = y_u * r_coeff;
+
+//     // Apply focal length and principal point to get the final image coordinates
+//     const T projected_x = principal_point_x + focal * x_d;
+//     const T projected_y = principal_point_y + focal * y_d;
+
+//     // Compute and return the error is the difference between the predicted
+//     //  and observed position
+//     out_residuals[0] = projected_x - T(eigen_X(i, 0));
+//     out_residuals[1] = projected_y - T(eigen_X(i, 1);
+//   }
+// }
+
+// template <typename T>
+// mwArray SQP_Pinhole_Intrinsic_Raidal_K3_FUN(mwArray X
+//                                             const T* const cam_K,
+//                                             const T* const cam_Rt,
+//                                             const T* const pos_3dpoint)
+// {
+//     // Enum to map intrinsics parameters between i23dSFM & ceres camera data parameter block.
+//   enum {
+//     OFFSET_FOCAL_LENGTH = 0,
+//     OFFSET_PRINCIPAL_POINT_X = 1,
+//     OFFSET_PRINCIPAL_POINT_Y = 2,
+//     OFFSET_DISTO_K1 = 3,
+//     OFFSET_DISTO_K2 = 4,
+//     OFFSET_DISTO_K3 = 5,
+//   };
+
+//   eigen::MatrixXd eigen_X = sfm::Matlab2Eigen(X);
+//   for(int i = 0; i < eigen_X.rows(); i++)
+//   {
+//     // Apply external parameters (Pose)
+//     const T * cam_R = cam_Rt;
+//     const T * cam_t = &cam_Rt[3];
+
+//     T pos_proj[3];
+//     // Rotate the point according the camera rotation
+//     ceres::AngleAxisRotatePoint(cam_R, pos_3dpoint, pos_proj);
+
+//     // Apply the camera translation
+//     pos_proj[0] += cam_t[0];
+//     pos_proj[1] += cam_t[1];
+//     pos_proj[2] += cam_t[2];
+
+//     // Transform the point from homogeneous to euclidean (undistorted point)
+//     const T x_u = pos_proj[0] / pos_proj[2];
+//     const T y_u = pos_proj[1] / pos_proj[2];
+
+//     // Apply intrinsic parameters
+
+//     const T& focal = cam_K[OFFSET_FOCAL_LENGTH];
+//     const T& principal_point_x = cam_K[OFFSET_PRINCIPAL_POINT_X];
+//     const T& principal_point_y = cam_K[OFFSET_PRINCIPAL_POINT_Y];
+//     const T& k1 = cam_K[OFFSET_DISTO_K1];
+//     const T& k2 = cam_K[OFFSET_DISTO_K2];
+//     const T& k3 = cam_K[OFFSET_DISTO_K3];
+
+//     // Apply distortion (xd,yd) = disto(x_u,y_u)
+//     const T r2 = x_u*x_u + y_u*y_u;
+//     const T r4 = r2 * r2;
+//     const T r6 = r4 * r2;
+//     const T r_coeff = (T(1) + k1*r2 + k2*r4 + k3*r6);
+//     const T x_d = x_u * r_coeff;
+//     const T y_d = y_u * r_coeff;
+
+//     // Apply focal length and principal point to get the final image coordinates
+//     const T projected_x = principal_point_x + focal * x_d;
+//     const T projected_y = principal_point_y + focal * y_d;
+//     // Compute and return the error is the difference between the predicted
+//     //  and observed position
+//     out_residuals[0] = projected_x - T(eigen_X(i, 0));
+//     out_residuals[1] = projected_y - T(eigen_X(i, 1);
+//   }
+// }
+
+// template <typename T>
+// mwArray SQP_Pinhole_Intrinsic__Brown_T2_FUN(mwArray X
+//                                             const T* const cam_K,
+//                                             const T* const cam_Rt,
+//                                             const T* const pos_3dpoint)
+// {
+//     // Enum to map intrinsics parameters between i23dSFM & ceres camera data parameter block.
+//   enum {
+//     OFFSET_FOCAL_LENGTH = 0,
+//     OFFSET_PRINCIPAL_POINT_X = 1,
+//     OFFSET_PRINCIPAL_POINT_Y = 2,
+//     OFFSET_DISTO_K1 = 3,
+//     OFFSET_DISTO_K2 = 4,
+//     OFFSET_DISTO_K3 = 5,
+//     OFFSET_DISTO_T1 = 6,
+//     OFFSET_DISTO_T2 = 7,
+//   };
+
+//   eigen::MatrixXd eigen_X = sfm::Matlab2Eigen(X);
+//   for(int i = 0; i < eigen_X.rows(); i++)
+//   {
+//     // Apply external parameters (Pose)
+//     const T * cam_R = cam_Rt;
+//     const T * cam_t = &cam_Rt[3];
+
+//     T pos_proj[3];
+//     // Rotate the point according the camera rotation
+//     ceres::AngleAxisRotatePoint(cam_R, pos_3dpoint, pos_proj);
+
+//     // Apply the camera translation
+//     pos_proj[0] += cam_t[0];
+//     pos_proj[1] += cam_t[1];
+//     pos_proj[2] += cam_t[2];
+
+//     // Transform the point from homogeneous to euclidean (undistorted point)
+//     const T x_u = pos_proj[0] / pos_proj[2];
+//     const T y_u = pos_proj[1] / pos_proj[2];
+
+//     // Apply intrinsic parameters
+
+//     const T& focal = cam_K[OFFSET_FOCAL_LENGTH];
+//     const T& principal_point_x = cam_K[OFFSET_PRINCIPAL_POINT_X];
+//     const T& principal_point_y = cam_K[OFFSET_PRINCIPAL_POINT_Y];
+//     const T& k1 = cam_K[OFFSET_DISTO_K1];
+//     const T& k2 = cam_K[OFFSET_DISTO_K2];
+//     const T& k3 = cam_K[OFFSET_DISTO_K3];
+//     const T& t1 = cam_K[OFFSET_DISTO_T1];
+//     const T& t2 = cam_K[OFFSET_DISTO_T2];
+
+//     // Apply distortion (xd,yd) = disto(x_u,y_u)
+//     const T r2 = x_u*x_u + y_u*y_u;
+//     const T r4 = r2 * r2;
+//     const T r6 = r4 * r2;
+//     const T r_coeff = (T(1) + k1*r2 + k2*r4 + k3*r6);
+//     const T t_x = t2 * (r2 + T(2) * x_u*x_u) + T(2) * t1 * x_u * y_u;
+//     const T t_y = t1 * (r2 + T(2) * y_u*y_u) + T(2) * t2 * x_u * y_u;
+//     const T x_d = x_u * r_coeff + t_x;
+//     const T y_d = y_u * r_coeff + t_y;
+
+//     // Apply focal length and principal point to get the final image coordinates
+//     const T projected_x = principal_point_x + focal * x_d;
+//     const T projected_y = principal_point_y + focal * y_d;
+
+//     // Compute and return the error is the difference between the predicted
+//     //  and observed position
+//     out_residuals[0] = projected_x - T(eigen_X(i, 0));
+//     out_residuals[1] = projected_y - T(eigen_X(i, 1);
+//   }
+// }
 
 
 } // namespace sfm
