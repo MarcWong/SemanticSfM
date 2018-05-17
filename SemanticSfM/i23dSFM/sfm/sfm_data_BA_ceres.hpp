@@ -11,6 +11,9 @@
 #include "i23dSFM/sfm/sfm_data_BA.hpp"
 #include "i23dSFM/sfm/sfm_data_BA_ceres_camera_functor.hpp"
 #include "ceres/ceres.h"
+#include "sqp/include/libFmincon.h"
+#include "sqp/include/cmlcpclass.h"
+#include "sqp/include/mclmcrrt.h"
 
 namespace i23dSFM {
 namespace sfm {
@@ -19,6 +22,9 @@ namespace sfm {
 ceres::CostFunction * IntrinsicsToCostFunction(
   cameras::IntrinsicBase * intrinsic,
   const Vec2 & observation);
+
+  mwArray SQP_FUN(IntrinsicBase * intrinsic, mwARRAY X);
+  mwArray SQP_SQP_NONLCON(IntrinsicBase * intrinsic, mwARRAY X_LABEL);
 
 class Bundle_Adjustment_Ceres : public Bundle_Adjustment
 {

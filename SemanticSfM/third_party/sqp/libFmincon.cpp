@@ -1,13 +1,13 @@
 //
 // MATLAB Compiler: 6.3 (R2016b)
-// Date: Tue May 15 19:29:53 2018
-// Arguments: "-B" "macro_default" "-W" "cpplib:fmincon" "-T" "link:lib"
-// "fmincon" 
+// Date: Wed May 16 21:58:17 2018
+// Arguments: "-B" "macro_default" "-W" "cpplib:libFmincon" "-T" "link:lib"
+// "fmincon.m" 
 //
 
 #include <stdio.h>
-#define EXPORTING_fmincon 1
-#include "fmincon.h"
+#define EXPORTING_libFmincon 1
+#include "libFmincon.h"
 
 static HMCRINSTANCE _mcr_inst = NULL;
 
@@ -47,12 +47,12 @@ static int mclDefaultErrorHandler(const char *s)
 /* This symbol is defined in shared libraries. Define it here
  * (to nothing) in case this isn't a shared library. 
  */
-#ifndef LIB_fmincon_C_API
-#define LIB_fmincon_C_API /* No special import/export declaration */
+#ifndef LIB_libFmincon_C_API
+#define LIB_libFmincon_C_API /* No special import/export declaration */
 #endif
 
-LIB_fmincon_C_API 
-bool MW_CALL_CONV fminconInitializeWithHandlers(
+LIB_libFmincon_C_API 
+bool MW_CALL_CONV libFminconInitializeWithHandlers(
     mclOutputHandlerFcn error_handler,
     mclOutputHandlerFcn print_handler)
 {
@@ -63,7 +63,7 @@ bool MW_CALL_CONV fminconInitializeWithHandlers(
     return false;
     {
         mclCtfStream ctfStream = 
-            mclGetEmbeddedCtfStream((void *)(fminconInitializeWithHandlers));
+            mclGetEmbeddedCtfStream((void *)(libFminconInitializeWithHandlers));
         if (ctfStream) {
             bResult = mclInitializeComponentInstanceEmbedded(   &_mcr_inst,
                                                                 error_handler, 
@@ -79,21 +79,21 @@ bool MW_CALL_CONV fminconInitializeWithHandlers(
   return true;
 }
 
-LIB_fmincon_C_API 
-bool MW_CALL_CONV fminconInitialize(void)
+LIB_libFmincon_C_API 
+bool MW_CALL_CONV libFminconInitialize(void)
 {
-  return fminconInitializeWithHandlers(mclDefaultErrorHandler, mclDefaultPrintHandler);
+  return libFminconInitializeWithHandlers(mclDefaultErrorHandler, mclDefaultPrintHandler);
 }
 
-LIB_fmincon_C_API 
-void MW_CALL_CONV fminconTerminate(void)
+LIB_libFmincon_C_API 
+void MW_CALL_CONV libFminconTerminate(void)
 {
   if (_mcr_inst != NULL)
     mclTerminateInstance(&_mcr_inst);
 }
 
-LIB_fmincon_C_API 
-void MW_CALL_CONV fminconPrintStackTrace(void) 
+LIB_libFmincon_C_API 
+void MW_CALL_CONV libFminconPrintStackTrace(void) 
 {
   char** stackTrace;
   int stackDepth = mclGetStackTrace(&stackTrace);
@@ -107,20 +107,21 @@ void MW_CALL_CONV fminconPrintStackTrace(void)
 }
 
 
-LIB_fmincon_C_API 
+LIB_libFmincon_C_API 
 bool MW_CALL_CONV mlxFmincon(int nlhs, mxArray *plhs[], int nrhs, mxArray *prhs[])
 {
   return mclFeval(_mcr_inst, "fmincon", nlhs, plhs, nrhs, prhs);
 }
 
-LIB_fmincon_CPP_API 
-void MW_CALL_CONV fmincon(int nargout, mwArray& o0, mwArray& o1, mwArray& o2, mwArray& 
-                          o3, mwArray& o4, mwArray& o5, mwArray& o6, const mwArray& i0, 
-                          const mwArray& i1, const mwArray& i2, const mwArray& i3, const 
-                          mwArray& i4, const mwArray& i5, const mwArray& i6, const 
-                          mwArray& i7, const mwArray& i8, const mwArray& i9, const 
-                          mwArray& varargin)
+LIB_libFmincon_CPP_API 
+void MW_CALL_CONV fmincon(int nargout, mwArray& X, mwArray& FVAL, mwArray& EXITFLAG, 
+                          mwArray& OUTPUT, mwArray& LAMBDA, mwArray& GRAD, mwArray& 
+                          HESSIAN, const mwArray& FUN, const mwArray& X_in1, const 
+                          mwArray& A, const mwArray& B, const mwArray& Aeq, const 
+                          mwArray& Beq, const mwArray& LB, const mwArray& UB, const 
+                          mwArray& NONLCON, const mwArray& options, const mwArray& 
+                          varargin)
 {
-  mclcppMlfFeval(_mcr_inst, "fmincon", nargout, 7, -11, &o0, &o1, &o2, &o3, &o4, &o5, &o6, &i0, &i1, &i2, &i3, &i4, &i5, &i6, &i7, &i8, &i9, &varargin);
+  mclcppMlfFeval(_mcr_inst, "fmincon", nargout, 7, -11, &X, &FVAL, &EXITFLAG, &OUTPUT, &LAMBDA, &GRAD, &HESSIAN, &FUN, &X_in1, &A, &B, &Aeq, &Beq, &LB, &UB, &NONLCON, &options, &varargin);
 }
 

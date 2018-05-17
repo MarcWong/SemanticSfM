@@ -1211,7 +1211,7 @@ bool SequentialSfMReconstructionEngine::BundleAdjustment()
   }
   Bundle_Adjustment_Ceres bundle_adjustment_obj(options);
   // return bundle_adjustment_obj.Adjust(_sfm_data, true, true, !_bFixedIntrinsics);
-  return bundle_adjustment_obj.Adjust(_sfm_data, true, true, !_bFixedIntrinsics);
+  return bundle_adjustment_obj.SemanticAdjust(_sfm_data, true, true, !_bFixedIntrinsics);
 }
 
 /**

@@ -10,6 +10,9 @@
 #include "i23dSFM/cameras/cameras.hpp"
 #include "ceres/rotation.h"
 
+#include "sqp/include/cmlcpclass.h"
+#include "sqp/include/mclmcrrt.h"
+
 //--
 //- Define ceres Cost_functor for each I23dSFM camera model
 //--
@@ -390,6 +393,80 @@ struct ResidualErrorFunctor_Pinhole_Intrinsic_Brown_T2
 
   double m_pos_2dpoint[2]; // The 2D observation
 };
+
+template <typename T>
+mwArray SQP_Pinhole_Intrinsic_FUN(mwArray X, 
+                                  const T* const cam_K,
+                                  const T* const cam_Rt,
+                                  const T* const pos_3dpoint)
+{
+  mwArray
+  for(auto i : rows)
+    // Apply external parameters (Pose)
+    const T * cam_R = cam_Rt;
+    const T * cam_t = &cam_Rt[3];
+
+    T pos_proj[3];
+    // Rotate the point according the camera rotation
+    ceres::AngleAxisRotatePoint(cam_R, pos_3dpoint, pos_proj);
+
+    // Apply the camera translation
+    pos_proj[0] += cam_t[0];
+    pos_proj[1] += cam_t[1];
+    pos_proj[2] += cam_t[2];
+
+    // Transform the point from homogeneous to euclidean (undistorted point)
+    const T x_u = pos_proj[0] / pos_proj[2];
+    const T y_u = pos_proj[1] / pos_proj[2];
+
+    //--
+    // Apply intrinsic parameters
+    //--
+
+    const T& focal = cam_K[OFFSET_FOCAL_LENGTH];
+    const T& principal_point_x = cam_K[OFFSET_PRINCIPAL_POINT_X];
+    const T& principal_point_y = cam_K[OFFSET_PRINCIPAL_POINT_Y];
+
+    // Apply focal length and principal point to get the final image coordinates
+    const T projected_x = principal_point_x + focal * x_u;
+    const T projected_y = principal_point_y + focal * y_u;
+
+    // Compute and return the error is the difference between the predicted
+    //  and observed position
+    out_residuals[0] = projected_x - T(m_pos_2dpoint[0]);
+    out_residuals[1] = projected_y - T(m_pos_2dpoint[1]);
+
+    return true;
+  
+}
+
+template <typename T>
+mwArray SQP_Pinhole_Intrinsic_Raidal_K1_FUN(mwArray X
+                                            const T* const cam_K,
+                                            const T* const cam_Rt,
+                                            const T* const pos_3dpoint)
+{
+
+}
+
+template <typename T>
+mwArray SQP_Pinhole_Intrinsic_Raidal_K3_FUN(mwArray X
+                                            const T* const cam_K,
+                                            const T* const cam_Rt,
+                                            const T* const pos_3dpoint)
+{
+
+}
+
+template <typename T>
+mwArray SQP_Pinhole_Intrinsic__Brown_T2_FUN(mwArray X
+                                            const T* const cam_K,
+                                            const T* const cam_Rt,
+                                            const T* const pos_3dpoint)
+{
+
+}
+
 
 } // namespace sfm
 } // namespace i23dSFM

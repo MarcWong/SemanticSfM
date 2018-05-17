@@ -1,0 +1,7 @@
+libFminconInitialize
+libFminconInitializeWithHandlers
+libFminconTerminate
+libFminconPrintStackTrace
+mlxFmincon
+fmincon
+
