@@ -30,13 +30,6 @@ html(lang='en')
       text-align: center;
       }
   body
-    #info
-      a(href='http://threejs.org', target='_blank', rel='noopener') three.js
-      |  -
-      |       PLY loader test by 
-      a(href='https://github.com/menway') Wei Meng
-      | . Image from 
-      a(href='http://people.sc.fsu.edu/~jburkardt/data/ply/ply.html') John Burkardt
     script(src='/javascripts/three.js')
     script(src='/javascripts/PLYLoader.js')
     script(src='/javascripts/Detector.js')
@@ -72,13 +65,13 @@ html(lang='en')
       plane.receiveShadow = true;
       // PLY file
       var loader = new THREE.PLYLoader();
-      loader.load( "/javascripts/robust_colorized_semantic.ply", function ( geometry ) {
+      loader.load( filename, function ( geometry ) {
       geometry.computeVertexNormals();//'/javascripts/robust_colorized_semantic.ply'
       var material = new THREE.MeshBasicMaterial( {  vertexColors: THREE.VertexColors,flatShading: true } );//0055ff
       var mesh = new THREE.Points(geometry,material);
       mesh.position.y =  0;
       mesh.position.z =  0.1;
-      mesh.rotation.x = Math.PI /2;
+      mesh.rotation.x = 0;//Math.PI /2;
       mesh.scale.multiplyScalar( 0.5 );
       mesh.castShadow = false;
       mesh.receiveShadow = false;

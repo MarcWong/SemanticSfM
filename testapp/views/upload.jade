@@ -8,6 +8,10 @@ html
     h1 使用multer中间件上传文件
     button(type="button", onclick='clean()')
       | 清空文件
+    button(type="button", onclick='analysis()')
+      | 开始
+    button(type="button", onclick="location.href='../'")
+      | 查看结果
     form(enctype='multipart/form-data', method='post', action='upload')
       | 请选择文件：
       input#file(type='file', name='file', multiple='')
@@ -26,6 +30,21 @@ html
 
           error: function () {
             alert('清空失败');
+          }
+        });
+      }
+      function analysis(){
+        //alert('clean')
+        $.ajax({
+          type: "POST",
+          url: "/analysis",
+          dataType: "json",
+          success: function () {
+            alert('成功');
+          },
+
+          error: function () {
+            alert('失败');
           }
         });
       }
