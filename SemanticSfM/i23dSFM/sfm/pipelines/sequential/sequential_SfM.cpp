@@ -580,8 +580,10 @@ bool SequentialSfMReconstructionEngine::MakeInitialPair3D(const Pair & current_p
       Vec3 X;
       TriangulateDLT(P1, x1_, P2, x2_, &X);
       Observations obs;
-      obs[view_I->id_view] = Observation(x1_, i);
-      obs[view_J->id_view] = Observation(x2_, j);
+      // obs[view_I->id_view] = Observation(x1_, i);
+      // obs[view_J->id_view] = Observation(x2_, j);
+      obs[view_I->id_view] = Observation(x1_, i, _features_provider->feats_per_view[I][i].semanticLabel());
+      obs[view_J->id_view] = Observation(x2_, j, _features_provider->feats_per_view[I][j].semanticLabel());
       landmarks[iterT->first].obs = std::move(obs);
       landmarks[iterT->first].X = X;
       landmarks[iterT->first].semantic_label = _features_provider->feats_per_view[I][i].semanticLabel();

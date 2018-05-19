@@ -18,9 +18,12 @@ struct Observation
 {
   Observation():id_feat(UndefinedIndexT) {  }
   Observation(const Vec2 & p, IndexT idFeat): x(p), id_feat(idFeat) {}
+  Observation(const Vec2 & p, IndexT idFeat, int sl): x(p), id_feat(idFeat), semantic_label(sl) {}  
 
   Vec2 x;
   IndexT id_feat;
+  int semantic_label;
+
 
   // Serialization
   template <class Archive>
@@ -29,6 +32,7 @@ struct Observation
     ar(cereal::make_nvp("id_feat", id_feat ));
     const std::vector<double> pp = { x(0), x(1) };
     ar(cereal::make_nvp("x", pp));
+    ar(cereal::make_nvp("semantic_label", semantic_label));    
   }
 
   // Serialization
@@ -39,6 +43,7 @@ struct Observation
     std::vector<double> p(2);
     ar(cereal::make_nvp("x", p));
     x = Eigen::Map<const Vec2>(&p[0]);
+    ar(cereal::make_nvp("semantic_label", semantic_label));
   }
 };
 /// Observations are indexed by their View_id

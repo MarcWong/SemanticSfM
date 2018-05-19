@@ -11,9 +11,9 @@
 #include "i23dSFM/sfm/sfm_data_BA.hpp"
 #include "i23dSFM/sfm/sfm_data_BA_ceres_camera_functor.hpp"
 #include "ceres/ceres.h"
-#include "sqp/include/libFmincon.h"
-#include "sqp/include/cmlcpclass.h"
-#include "sqp/include/mclmcrrt.h"
+// #include "sqp/include/libFmincon.h"
+// #include "sqp/include/cmlcpclass.h"
+// #include "sqp/include/mclmcrrt.h"
 
 namespace i23dSFM {
 namespace sfm {
@@ -22,6 +22,12 @@ namespace sfm {
 ceres::CostFunction * IntrinsicsToCostFunction(
   cameras::IntrinsicBase * intrinsic,
   const Vec2 & observation);
+
+ceres::CostFunction * SemanticIntrinsicsToCostFunction(
+  cameras::IntrinsicBase * intrinsic,
+  const Vec2 & observation,
+  const int sem2d,
+  const int sem3d);
 
   // mwArray SQP_FUN(IntrinsicBase * intrinsic, mwARRAY X);
   // mwArray SQP_NONLCON(IntrinsicBase * intrinsic, mwArray X_LABEL);
@@ -53,12 +59,12 @@ class Bundle_Adjustment_Ceres : public Bundle_Adjustment
     bool bRefineIntrinsics = true,  // tell if the camera intrinsic will be refined
     bool bRefineStructure = true);  // tell if the structure will be refined
 
-  bool SemanticAdjust(
-    SfM_Data & sfm_data,            // the SfM scene to refine
-    bool bRefineRotations = true,   // tell if pose rotations will be refined
-    bool bRefineTranslations = true,// tell if the pose translation will be refined
-    bool bRefineIntrinsics = true,  // tell if the camera intrinsic will be refined
-    bool bRefineStructure = true);  // tell if the structure will be refined
+  // bool SemanticAdjust(
+  //   SfM_Data & sfm_data,            // the SfM scene to refine
+  //   bool bRefineRotations = true,   // tell if pose rotations will be refined
+  //   bool bRefineTranslations = true,// tell if the pose translation will be refined
+  //   bool bRefineIntrinsics = true,  // tell if the camera intrinsic will be refined
+  //   bool bRefineStructure = true);  // tell if the structure will be refined
 };
 
 } // namespace sfm

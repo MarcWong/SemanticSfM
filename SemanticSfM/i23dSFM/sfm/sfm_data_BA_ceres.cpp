@@ -40,34 +40,29 @@ ceres::CostFunction * IntrinsicsToCostFunction(IntrinsicBase * intrinsic, const 
   }
 }
 
-// mwArray SQP_FUN(IntrinsicBase* instrinsic, mwArrray X)
-// {
-//   switch(intrinsic->getType())
-//   {
-//     case PINHOLE_CAMERA:
-//       return SQP_Pinhole_Intrinsic_FUN(X, cam_K, cam_Rt, pos_3dpoint);
-//     break;
-
-//     case PINHOLE_CAMERA_RADIAL1:
-//       return SQP_Pinhole_Intrinsic_Raidal_K1_FUN(X, cam_K, cam_Rt, pos_3dpoint);
-//     break;
-
-//     case PINHOLE_CAMERA_RADIAL3:
-//       return SQP_Pinhole_Intrinsic_Raidal_K3_FUN(X, cam_K, cam_Rt, pos_3dpoint);
-//     break;
-
-//     case PINHOLE_CAMERA_BROWN:
-//       return SQP_Pinhole_Intrinsic__Brown_T2_FUN(X, cam_K, cam_Rt, pos_3dpoint);
-//     break;
-//     default:
-//       return NULL;
-//   }
-// }
-
-// mwArray SQP_NONLCON(IntrinsicBase * intrinsic, mwArray X_LABEL)
-// {
-
-// }
+ceres::CostFunction * SemanticIntrinsicsToCostFunction(IntrinsicBase * intrinsic, const Vec2 & observation, const int sem2d, const int sem3d)
+{
+  switch(intrinsic->getType())
+  {
+    case PINHOLE_CAMERA:
+      return new ceres::AutoDiffCostFunction<Semantic_ResidualErrorFunctor_Pinhole_Intrinsic, 3, 3, 6, 3>(
+        new Semantic_ResidualErrorFunctor_Pinhole_Intrinsic(observation.data(), sem2d, sem3d));
+    break;
+    case PINHOLE_CAMERA_RADIAL1:
+      return new ceres::AutoDiffCostFunction<Semantic_ResidualErrorFunctor_Pinhole_Intrinsic_Radial_K1, 3, 4, 6, 3>(
+        new Semantic_ResidualErrorFunctor_Pinhole_Intrinsic_Radial_K1(observation.data(), sem2d, sem3d));
+    break;
+    case PINHOLE_CAMERA_RADIAL3:
+      return new ceres::AutoDiffCostFunction<Semantic_ResidualErrorFunctor_Pinhole_Intrinsic_Radial_K3, 3, 6, 6, 3>(
+        new Semantic_ResidualErrorFunctor_Pinhole_Intrinsic_Radial_K3(observation.data(), sem2d, sem3d));
+    break;
+    case PINHOLE_CAMERA_BROWN:
+      return new ceres::AutoDiffCostFunction<Semantic_ResidualErrorFunctor_Pinhole_Intrinsic_Brown_T2, 3, 8, 6, 3>(
+        new Semantic_ResidualErrorFunctor_Pinhole_Intrinsic_Brown_T2(observation.data(), sem2d, sem3d));
+    default:
+      return NULL;
+  }
+}
 
 
 Bundle_Adjustment_Ceres::BA_options::BA_options(const bool bVerbose, bool bmultithreaded)
@@ -228,15 +223,29 @@ bool Bundle_Adjustment_Ceres::Adjust(
       // Each Residual block takes a point and a camera as input and outputs a 2
       // dimensional residual. Internally, the cost function stores the observed
       // image location and compares the reprojection against the observation.
+      // ceres::CostFunction* cost_function =
+      //   IntrinsicsToCostFunction(sfm_data.intrinsics[view->id_intrinsic].get(), itObs->second.x);
+
+      // if (cost_function)
+      //   problem.AddResidualBlock(cost_function,
+      //                            p_LossFunction,
+      //                            &map_intrinsics[view->id_intrinsic][0],
+      //                            &map_poses[view->id_pose][0],
+      //                            iterTracks->second.X.data()); //Do we need to copy 3D point to avoid false motion, if failure ?
+
+      // modified by chenyu
       ceres::CostFunction* cost_function =
-        IntrinsicsToCostFunction(sfm_data.intrinsics[view->id_intrinsic].get(), itObs->second.x);
+      SemanticIntrinsicsToCostFunction(sfm_data.intrinsics[view->id_intrinsic].get(), 
+                                       itObs->second.x, 
+                                       itObs->second.semantic_label,
+                                       iterTracks->second.semantic_label);
 
       if (cost_function)
         problem.AddResidualBlock(cost_function,
                                  p_LossFunction,
                                  &map_intrinsics[view->id_intrinsic][0],
                                  &map_poses[view->id_pose][0],
-                                 iterTracks->second.X.data()); //Do we need to copy 3D point to avoid false motion, if failure ?
+                                 iterTracks->second.X.data());
     }
     if (!bRefineStructure)
       problem.SetParameterBlockConstant(iterTracks->second.X.data());
@@ -317,190 +326,200 @@ bool Bundle_Adjustment_Ceres::Adjust(
   }
 }
 
-bool Bundle_Adjustment_Ceres::SemanticAdjust(
-  SfM_Data & sfm_data,     // the SfM scene to refine
-  bool bRefineRotations,   // tell if pose rotations will be refined
-  bool bRefineTranslations,// tell if the pose translation will be refined
-  bool bRefineIntrinsics,  // tell if the camera intrinsic will be refined
-  bool bRefineStructure)   // tell if the structure will be refined
-{
-  if(!libFminconInitialize())
-  {
-    std::cout << "cannot initialize with mathlab code" << std::endl;
-    return false;
-  }
-  // Data wrapper for refinement:
-  Hash_Map<IndexT, std::vector<double> > map_intrinsics;
-  Hash_Map<IndexT, std::vector<double> > map_poses;
+// bool Bundle_Adjustment_Ceres::SemanticAdjust(
+//   SfM_Data & sfm_data,     // the SfM scene to refine
+//   bool bRefineRotations,   // tell if pose rotations will be refined
+//   bool bRefineTranslations,// tell if the pose translation will be refined
+//   bool bRefineIntrinsics,  // tell if the camera intrinsic will be refined
+//   bool bRefineStructure)   // tell if the structure will be refined
+// {
+//   if(!libFminconInitialize())
+//   {
+//     std::cout << "cannot initialize with mathlab code" << std::endl;
+//     return false;
+//   }
+//   // Data wrapper for refinement:
+//   Hash_Map<IndexT, std::vector<double> > map_intrinsics;
+//   Hash_Map<IndexT, std::vector<double> > map_poses;
 
-  // Setup Poses data & subparametrization
-  for (Poses::const_iterator itPose = sfm_data.poses.begin(); itPose != sfm_data.poses.end(); ++itPose)
-  {
-    const IndexT indexPose = itPose->first;
+//   // Setup Poses data & subparametrization
+//   for (Poses::const_iterator itPose = sfm_data.poses.begin(); itPose != sfm_data.poses.end(); ++itPose)
+//   {
+//     const IndexT indexPose = itPose->first;
 
-    const Pose3 & pose = itPose->second;
-    const Mat3 R = pose.rotation();
-    const Vec3 t = pose.translation();
+//     const Pose3 & pose = itPose->second;
+//     const Mat3 R = pose.rotation();
+//     const Vec3 t = pose.translation();
 
-    double angleAxis[3];
-    ceres::RotationMatrixToAngleAxis((const double*)R.data(), angleAxis);
-    map_poses[indexPose].reserve(6); //angleAxis + translation
-    map_poses[indexPose].push_back(angleAxis[0]);
-    map_poses[indexPose].push_back(angleAxis[1]);
-    map_poses[indexPose].push_back(angleAxis[2]);
-    map_poses[indexPose].push_back(t(0));
-    map_poses[indexPose].push_back(t(1));
-    map_poses[indexPose].push_back(t(2));
+//     double angleAxis[3];
+//     ceres::RotationMatrixToAngleAxis((const double*)R.data(), angleAxis);
+//     map_poses[indexPose].reserve(6); //angleAxis + translation
+//     map_poses[indexPose].push_back(angleAxis[0]);
+//     map_poses[indexPose].push_back(angleAxis[1]);
+//     map_poses[indexPose].push_back(angleAxis[2]);
+//     map_poses[indexPose].push_back(t(0));
+//     map_poses[indexPose].push_back(t(1));
+//     map_poses[indexPose].push_back(t(2));
 
-    double * parameter_block = &map_poses[indexPose][0];
-    // problem.AddParameterBlock(parameter_block, 6);
-    if (!bRefineTranslations && !bRefineRotations)
-    {
-      // problem.SetParameterBlockConstant(parameter_block);
-    }
-    else  
-    {
-      // Subset parametrization
-      std::vector<int> vec_constant_extrinsic;
-      if(!bRefineRotations)
-      {
-        vec_constant_extrinsic.push_back(0);
-        vec_constant_extrinsic.push_back(1);
-        vec_constant_extrinsic.push_back(2);
-      }
-      if(!bRefineTranslations)
-      {
-        vec_constant_extrinsic.push_back(3);
-        vec_constant_extrinsic.push_back(4);
-        vec_constant_extrinsic.push_back(5);
-      }
-      if (!vec_constant_extrinsic.empty())
-      {
-        ceres::SubsetParameterization *subset_parameterization =
-          new ceres::SubsetParameterization(6, vec_constant_extrinsic);
-        problem.SetParameterization(parameter_block, subset_parameterization);
-      }
-    }
-  }
+//     double * parameter_block = &map_poses[indexPose][0];
+//     // problem.AddParameterBlock(parameter_block, 6);
+//     if (!bRefineTranslations && !bRefineRotations)
+//     {
+//       // problem.SetParameterBlockConstant(parameter_block);
+//     }
+//     else  
+//     {
+//       // Subset parametrization
+//       std::vector<int> vec_constant_extrinsic;
+//       if(!bRefineRotations)
+//       {
+//         vec_constant_extrinsic.push_back(0);
+//         vec_constant_extrinsic.push_back(1);
+//         vec_constant_extrinsic.push_back(2);
+//       }
+//       if(!bRefineTranslations)
+//       {
+//         vec_constant_extrinsic.push_back(3);
+//         vec_constant_extrinsic.push_back(4);
+//         vec_constant_extrinsic.push_back(5);
+//       }
+//       if (!vec_constant_extrinsic.empty())
+//       {
+//         ceres::SubsetParameterization *subset_parameterization =
+//           new ceres::SubsetParameterization(6, vec_constant_extrinsic);
+//         problem.SetParameterization(parameter_block, subset_parameterization);
+//       }
+//     }
+//   }
 
-  // Setup Intrinsics data & subparametrization
-  for (Intrinsics::const_iterator itIntrinsic = sfm_data.intrinsics.begin();
-    itIntrinsic != sfm_data.intrinsics.end(); ++itIntrinsic)
-  {
-    const IndexT indexCam = itIntrinsic->first;
+//   // Setup Intrinsics data & subparametrization
+//   for (Intrinsics::const_iterator itIntrinsic = sfm_data.intrinsics.begin();
+//     itIntrinsic != sfm_data.intrinsics.end(); ++itIntrinsic)
+//   {
+//     const IndexT indexCam = itIntrinsic->first;
 
-    if (isValid(itIntrinsic->second->getType()))
-    {
-      map_intrinsics[indexCam] = itIntrinsic->second->getParams();
+//     if (isValid(itIntrinsic->second->getType()))
+//     {
+//       map_intrinsics[indexCam] = itIntrinsic->second->getParams();
 
-      double * parameter_block = &map_intrinsics[indexCam][0];
-      // problem.AddParameterBlock(parameter_block, map_intrinsics[indexCam].size());
-    }
-    else
-    {
-      std::cerr << "Unsupported camera type." << std::endl;
-    }
-  }
+//       double * parameter_block = &map_intrinsics[indexCam][0];
+//       // problem.AddParameterBlock(parameter_block, map_intrinsics[indexCam].size());
+//     }
+//     else
+//     {
+//       std::cerr << "Unsupported camera type." << std::endl;
+//     }
+//   }
 
-  eigen::MatrixXd eigen_x = eigen::MatrixXd::Zero(sfm_data.structure.size(), 2);
-  eigen::MatrixXd eigen_X = eigen::MatrixXd::Zero(sfm_data.structure.size(), 3);
-  eigen::MatrixXd label_X = eigen::MatrixXd::Zero();
-  // mwArray X(sfm_data.structure.size(), 2, mxDOUBLE_CLASS);
+//   eigen::MatrixXd eigen_x = eigen::MatrixXd::Zero(sfm_data.structure.size(), 2);
+//   eigen::MatrixXd eigen_X = eigen::MatrixXd::Zero(sfm_data.structure.size(), 12);
+//   eigen::MatrixXd label_X = eigen::MatrixXd::Zero();
 
-  // For all visibility add reprojections errors:
-  for (Landmarks::iterator iterTracks = sfm_data.structure.begin(); iterTracks!= sfm_data.structure.end(); ++iterTracks)
-  {
-    const Observations & obs = iterTracks->second.obs;
-    for (Observations::const_iterator itObs = obs.begin(); itObs != obs.end(); ++itObs)
-    {
-      // Build the residual block corresponding to the track observation:
-      const View * view = sfm_data.views.at(itObs->first).get();
+//   // For all visibility add reprojections errors:
+//   for (Landmarks::iterator iterTracks = sfm_data.structure.begin(); iterTracks!= sfm_data.structure.end(); ++iterTracks)
+//   {
+//     const Observations & obs = iterTracks->second.obs;
+//     for (Observations::const_iterator itObs = obs.begin(); itObs != obs.end(); ++itObs)
+//     {
+//       // Build the residual block corresponding to the track observation:
+//       const View * view = sfm_data.views.at(itObs->first).get();
 
-      // Each Residual block takes a point and a camera as input and outputs a 2
-      // dimensional residual. Internally, the cost function stores the observed
-      // image location and compares the reprojection against the observation.
-      // ceres::CostFunction* cost_function =
-      //   IntrinsicsToCostFunction(sfm_data.intrinsics[view->id_intrinsic].get(), itObs->second.x);
-      eigen_x(k, 0) = itObs->second.x[0];
-      eigen_x(k, 1) = itObs->second.x[1];
+//       // Each Residual block takes a point and a camera as input and outputs a 2
+//       // dimensional residual. Internally, the cost function stores the observed
+//       // image location and compares the reprojection against the observation.
+//       eigen_x(k, 0) = itObs->second.x[0];
+//       eigen_x(k, 1) = itObs->second.x[1];
 
-      // if (cost_function)
-      //   problem.AddResidualBlock(cost_function,
-      //                            p_LossFunction,
-      //                            &map_intrinsics[view->id_intrinsic][0],
-      //                            &map_poses[view->id_pose][0],
-      //                            iterTracks->second.X.data());
-    }
-  }
+//       eigen_X(k, 0) = map_intrinsics[view->id_intrinsic][0];
+//       eigen_X(k, 1) = map_intrinsics[view->id_intrinsic][1];
+//       eigen_X(k, 2) = map_intrinsics[view->id_intrinsic][2];      
+//       eigen_X(k, 3) = map_poses[view->id_pose][0];
+//       eigen_X(k, 4) = map_poses[view->id_pose][1];
+//       eigen_X(k, 5) = map_poses[view->id_pose][2];
+//       eigen_X(k, 6) = map_poses[view->id_pose][3];
+//       eigen_X(k, 7) = map_poses[view->id_pose][4];
+//       eigen_X(k, 8) = map_poses[view->id_pose][5];
+//       eigen_X(k, 3) = iterTracks->second.X.data()[0];
+//       eigen_X(k, 4) = iterTracks->second.X.data()[1];
+//       eigen_X(k, 5) = iterTracks->second.X.data()[2];
 
-  mwArray X = sfm::Eigen2Matlab(eigen_X);
+//       // if (cost_function)
+//       //   problem.AddResidualBlock(cost_function,
+//       //                            p_LossFunction,
+//       //                            &map_intrinsics[view->id_intrinsic][0],
+//       //                            &map_poses[view->id_pose][0],
+//       //                            iterTracks->second.X.data());
+//     }
+//   }
 
-  // Configure a BA engine and run it
-  mwArray FVAL(1, 1, mxDOUBLE_CLASS);
-  mwArray sqp_options();
-  fmincon(2, X, FVAL, EXITFLAG, OUTPUT, LAMBDA, GRAD, HESSIEAN, 
-          SQP_FUN, X_inl, [], [], [], [], [], [], SQP_NONLCON, sqp_options, []);
+//   // mwArray X = sfm::Eigen2Matlab(eigen_X);
+
+//   // Configure a BA engine and run it
+//   // mwArray FVAL(1, 1, mxDOUBLE_CLASS);
+//   // mwArray sqp_options();
+//   // fmincon(2, X, FVAL, EXITFLAG, OUTPUT, LAMBDA, GRAD, HESSIEAN, 
+//   //         SQP_FUN, X_inl, [], [], [], [], [], [], SQP_NONLCON, sqp_options, []);
 
 
-  // If no error, get back refined parameters
-  if (!summary.IsSolutionUsable())
-  {
-    if (_i23dSFM_options._bVerbose)
-      std::cout << "Bundle Adjustment failed." << std::endl;
-    return false;
-  }
-  else // Solution is usable
-  {
-    if (_i23dSFM_options._bVerbose)
-    {
-      // Display statistics about the minimization
-      std::cout << std::endl
-        << "Bundle Adjustment statistics (approximated RMSE):\n"
-        << " #views: " << sfm_data.views.size() << "\n"
-        << " #poses: " << sfm_data.poses.size() << "\n"
-        << " #intrinsics: " << sfm_data.intrinsics.size() << "\n"
-        << " #tracks: " << sfm_data.structure.size() << "\n"
-        << " #residuals: " << summary.num_residuals << "\n"
-        << " Initial RMSE: " << std::sqrt( summary.initial_cost / summary.num_residuals) << "\n"
-        << " Final RMSE: " << std::sqrt( summary.final_cost / summary.num_residuals) << "\n"
-        << " Time (s): " << summary.total_time_in_seconds << "\n"
-        << std::endl;
-    }
+//   // If no error, get back refined parameters
+//   if (!summary.IsSolutionUsable())
+//   {
+//     if (_i23dSFM_options._bVerbose)
+//       std::cout << "Bundle Adjustment failed." << std::endl;
+//     return false;
+//   }
+//   else // Solution is usable
+//   {
+//     if (_i23dSFM_options._bVerbose)
+//     {
+//       // Display statistics about the minimization
+//       std::cout << std::endl
+//         << "Bundle Adjustment statistics (approximated RMSE):\n"
+//         << " #views: " << sfm_data.views.size() << "\n"
+//         << " #poses: " << sfm_data.poses.size() << "\n"
+//         << " #intrinsics: " << sfm_data.intrinsics.size() << "\n"
+//         << " #tracks: " << sfm_data.structure.size() << "\n"
+//         << " #residuals: " << summary.num_residuals << "\n"
+//         << " Initial RMSE: " << std::sqrt( summary.initial_cost / summary.num_residuals) << "\n"
+//         << " Final RMSE: " << std::sqrt( summary.final_cost / summary.num_residuals) << "\n"
+//         << " Time (s): " << summary.total_time_in_seconds << "\n"
+//         << std::endl;
+//     }
 
-    // Update camera poses with refined data
-    if (bRefineRotations || bRefineTranslations)
-    {
-      for (Poses::iterator itPose = sfm_data.poses.begin();
-        itPose != sfm_data.poses.end(); ++itPose)
-      {
-        const IndexT indexPose = itPose->first;
+//     // Update camera poses with refined data
+//     if (bRefineRotations || bRefineTranslations)
+//     {
+//       for (Poses::iterator itPose = sfm_data.poses.begin();
+//         itPose != sfm_data.poses.end(); ++itPose)
+//       {
+//         const IndexT indexPose = itPose->first;
 
-        Mat3 R_refined;
-        ceres::AngleAxisToRotationMatrix(&map_poses[indexPose][0], R_refined.data());
-        Vec3 t_refined(map_poses[indexPose][3], map_poses[indexPose][4], map_poses[indexPose][5]);
-        // Update the pose
-        Pose3 & pose = itPose->second;
-        pose = Pose3(R_refined, -R_refined.transpose() * t_refined);
-      }
-    }
+//         Mat3 R_refined;
+//         ceres::AngleAxisToRotationMatrix(&map_poses[indexPose][0], R_refined.data());
+//         Vec3 t_refined(map_poses[indexPose][3], map_poses[indexPose][4], map_poses[indexPose][5]);
+//         // Update the pose
+//         Pose3 & pose = itPose->second;
+//         pose = Pose3(R_refined, -R_refined.transpose() * t_refined);
+//       }
+//     }
 
-    // Update camera intrinsics with refined data
-    if (bRefineIntrinsics)
-    {
-      for (Intrinsics::iterator itIntrinsic = sfm_data.intrinsics.begin();
-        itIntrinsic != sfm_data.intrinsics.end(); ++itIntrinsic)
-      {
-        const IndexT indexCam = itIntrinsic->first;
+//     // Update camera intrinsics with refined data
+//     if (bRefineIntrinsics)
+//     {
+//       for (Intrinsics::iterator itIntrinsic = sfm_data.intrinsics.begin();
+//         itIntrinsic != sfm_data.intrinsics.end(); ++itIntrinsic)
+//       {
+//         const IndexT indexCam = itIntrinsic->first;
 
-        const std::vector<double> & vec_params = map_intrinsics[indexCam];
-        itIntrinsic->second.get()->updateFromParams(vec_params);
-      }
-    }
-    return true;
-  }
+//         const std::vector<double> & vec_params = map_intrinsics[indexCam];
+//         itIntrinsic->second.get()->updateFromParams(vec_params);
+//       }
+//     }
+//     return true;
+//   }
 
-  return true;
-}
+//   return true;
+// }
 
 } // namespace sfm
 } // namespace i23dSFM
