@@ -5,11 +5,15 @@ const fs = require('fs');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-	res.render('index', { title: 'Express' });
+	res.render('index', { title: 'Express',results : '/javascripts/robust_colorized_semantic.ply'});
 });
 
 router.get('/upload',function(req, res, next) {
 	res.render('upload', { title: 'Express' });
+});
+
+router.get('/analysis',function(req, res, next) {
+	res.json({ success: 'success' });
 });
 
 var storage = multer.diskStorage({
