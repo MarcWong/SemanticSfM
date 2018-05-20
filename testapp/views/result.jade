@@ -77,66 +77,6 @@ html(lang='en')
       mesh.receiveShadow = false;
       scene.add( mesh );
       } );
-
-      /*
-      loader.load( "/javascripts/red.ply", function ( geometry ) {
-      geometry.computeVertexNormals();//'/javascripts/robust_colorized_semantic.ply'
-      var material = new THREE.MeshBasicMaterial( {  vertexColors: 0xFF0000,flatShading: true } );//0055ff
-      //var mesh = new THREE.Mesh( geometry, material );color: 0x000000,
-      //var starsMaterial = new THREE.PointsMaterial( { color: 0xFF0000 } );
-      //var material = new THREE.PointCloudMaterial({size:1, vertexColors:true, color:0xFF0000});
-      var mesh = new THREE.Points(geometry,material);
-      mesh.position.y =  0;
-      mesh.position.z =  0.1;
-      mesh.rotation.x = Math.PI /2;
-      mesh.scale.multiplyScalar( 0.5 );
-      mesh.castShadow = false;
-      mesh.receiveShadow = false;
-      scene.add( mesh );
-      } );
-      loader.load( "/javascripts/green.ply", function ( geometry ) {
-      geometry.computeVertexNormals();//'/javascripts/robust_colorized_semantic.ply'
-      var material = new THREE.MeshBasicMaterial( {  vertexColors: 0x008000,flatShading: true } );//0055ff
-      //var material = new THREE.PointCloudMaterial({size:1, vertexColors:true, color:0x008000});
-      //var mesh = new THREE.Mesh( geometry, material );color: 0x000000,008000
-      var mesh = new THREE.Points(geometry,material);
-      mesh.position.y =  0;
-      mesh.position.z =  0.1;
-      mesh.rotation.x = Math.PI /2;
-      mesh.scale.multiplyScalar( 0.5 );
-      mesh.castShadow = false;
-      mesh.receiveShadow = false;
-      scene.add( mesh );
-      } );
-      loader.load( "/javascripts/blue.ply", function ( geometry ) {
-      geometry.computeVertexNormals();//'/javascripts/robust_colorized_semantic.ply'
-      var material = new THREE.MeshBasicMaterial( {  vertexColors: 0x0000FF,flatShading: true } );//0055ff
-      //var mesh = new THREE.Mesh( geometry, material );color: 0x000000,0000FF
-      //var starsMaterial = new THREE.PointsMaterial( { color: 0x0000FF } );
-      //var material = new THREE.PointCloudMaterial({size:1, vertexColors:true, color:0x0000FF});
-      var mesh = new THREE.Points(geometry,material);
-      mesh.position.y =  0;
-      mesh.position.z =  0.1;
-      mesh.rotation.x = Math.PI /2;
-      mesh.scale.multiplyScalar( 0.5 );
-      mesh.castShadow = false;
-      mesh.receiveShadow = false;
-      scene.add( mesh );
-      } );
-
-      */
-      /*loader.load( '/javascripts/Lucy100k.ply', function ( geometry ) {
-      geometry.computeVertexNormals();
-      var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
-      var mesh = new THREE.Mesh( geometry, material );
-      mesh.position.x = - 0.2;
-      mesh.position.y = - 0.02;
-      mesh.position.z = - 0.2;
-      mesh.scale.multiplyScalar( 0.0001 );
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      scene.add( mesh );
-      } );*/
       // Lights
       scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
       addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
@@ -155,6 +95,7 @@ html(lang='en')
       // resize
       window.addEventListener( 'resize', onWindowResize, false );
       }
+      
       function addShadowedLight( x, y, z, color, intensity ) {
       var directionalLight = new THREE.DirectionalLight( color, intensity );
       directionalLight.position.set( x, y, z );

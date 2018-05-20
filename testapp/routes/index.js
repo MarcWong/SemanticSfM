@@ -4,15 +4,21 @@ var multer  = require('multer')
 const fs = require('fs');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-	res.render('index', { title: 'Express',results : '/javascripts/robust_colorized_semantic.ply'});
+router.get('/result', function(req, res, next) {
+	res.render('result', { title: 'Express',results : '/javascripts/robust_colorized_semantic.ply'});
 });
 
-router.get('/upload',function(req, res, next) {
+router.get('/',function(req, res, next) {
 	res.render('upload', { title: 'Express' });
 });
 
 router.get('/analysis',function(req, res, next) {
+	console.log('analysis')
+	var exec = require('child_process').exec,child;
+	child = exec('../SementicSFM/do.sh ./public/uploads ./public/uploads',function(err,out) { 
+		console.log(out); err && console.log(err); 
+		res.json({res_code: '0'});
+	});
 	res.json({ success: 'success' });
 });
 
