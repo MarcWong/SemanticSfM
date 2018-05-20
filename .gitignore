@@ -3,3 +3,7 @@ SemanticSfM/.idea/*
 SemanticSfM/build/*
 dlib_test/*
 matlab_test/build/*
+*.DS_Store
+*/package-lock.json
+*/node_modules
+*/npm-debug.log
