@@ -7,3 +7,5 @@ matlab_test/build/*
 */package-lock.json
 */node_modules
 */npm-debug.log
+*.ply
+testapp/public/uploads/
