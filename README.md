@@ -1,36 +1,70 @@
 # DIP-i23d
 Our own 3d reconstruction project of Digital Image Processing course in Peking University.
+
+|Author|
+|------|
+| 陈煜 |
+|王旭普|
+| 王尧 |
+
 **Code for other usages are not allowed!**
 
-## Linux compilation of SemanticSfM
+## code map
 
-**1. Install Dependencies**
-* sudo apt-get install libpng-dev libjpeg-dev libtiff-dev libxxf86vm1 libxxf86vm-dev libxi-dev libxrandr-dev
-
-If you want see the view graph svg logs
-* sudo apt-get install graphviz
-
-**2. Build SemanticSfM**
 ```
- $ cd SemanticSfM
- $ mkdir build&& cd build
- $ cmake ..
- ```
-
-Compile the project
- * $ make
-
-For a multi-core compilation (Replace NBcore with the number of threads)
- * $ make -j NBcore
-
-For test if build successfully
- *$ make test
-
-**3. Run SemanticSfM**
-
- * python SemanticSfM/build/software/Sfm/Sfm_SequentialPipeline.py ${image_dir} ${output_dir} 0 
- 
- or
-
- * ./do.sh ${image_dir} ${output_dir}
-
+$DIP-i23d
+│
+│─ README.md —— this file
+│
+|─ SemanticSfM —— structure from motion system
+│  │
+│  │─ do.sh  —— running script
+│  │
+│  │─ cmakeFindModules
+│  │
+│  │─ dependencies
+│  │
+│  │─ i23dSFM
+│  │
+│  │─ nonFree
+│  │
+│  │─ software
+│  │
+│  │─ testing
+│  │
+│  └─ third_party
+│   
+|─ testapp —— point cloud visualization by webGL
+│  │
+│  |─README.md —— user instruction of nodeJS
+│  │
+│  │─bin
+│  │
+│  │─public
+│  │
+│  │─routes
+│  │
+│  └─views
+│   
+└─ tensorpack —— semantic segmentation code
+   │
+   |─ README.md —— user instruction of tensorpack
+   │
+   │─ examples
+   │  │
+   │  └─ Deeplab
+   │     │
+   │     │─ metadata —— data path txt here
+   │     │
+   │     │─ PSSD
+   │     │  │
+   │     │  │- deeplabv2res101.pssd_train.py
+   │     │  │
+   │     │  │- deeplabv2res101.pssd_test.py
+   │     │  │
+   │     │  │- deeplabv2res101.pssd_val.py
+   │     │  │
+   │     │  ...
+   │     ...
+   ...
+```
