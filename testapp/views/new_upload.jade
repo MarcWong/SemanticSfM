@@ -1,0 +1,69 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    script(src="./javascripts/jquery.min.js")
+    link(href="/stylesheets/bootstrap.min.css", rel="stylesheet")
+    link(href="/stylesheets/swiper.min.css", rel="stylesheet")
+    link(href="/stylesheets/hover.min.css", rel="stylesheet", media="all")
+    link(href="/stylesheets/animate.min.css", rel="stylesheet", media="all")
+    link(href="/stylesheets/main.min.css", rel="stylesheet")
+    link(rel="shortcut icon" href="/images/daohang_log.icon" style="width:32px;height:32px; ")
+
+    title 上传文件
+  body
+    #result
+    .bg.safe
+      .main
+        h3.row.upload-title 语义重建
+          span 上传页面
+      .row
+        .col-md-6.col-md-offset-3.col-sm-10.col-sm-offset-1.col-xs-10.col-xs-offset-1.upload-body
+          .row
+            form(enctype='multipart/form-data', method='post', action='upload')
+              .col-md-6.col-sm-6.col-xs-12.left(id="drop_area")
+                .col-md-12
+                  p.p01(id= 'p01') 请选择文件：
+                  input#file(type='file', name='file', multiple='')
+              .col-md-6.col-sm-6.col-xs-12.right
+                .updown
+                  input(type='submit', value='上传文件') 
+                  span.sp01(id='sp01') 本地上传
+      .row.more
+        a.col-md-4.col-md-offset-4.col-sm-4.col-sm-offset-4.col-xs-6.col-xs-offset-3#app_upload(onclick="analysis()") 开始检测
+        a.col-md-4.col-md-offset-4.col-sm-4.col-sm-offset-4.col-xs-6.col-xs-offset-3#app_upload(onclick="location.href='/result'") 查看结果
+        a.col-md-4.col-md-offset-4.col-sm-4.col-sm-offset-4.col-xs-6.col-xs-offset-3#app_upload(onclick="clean()") 清空文件
+  script(type='text/javascript').
+      contentline = '!{content}'
+      if(contentline != '')
+        alert("上传成功")
+      function clean(){
+        //alert('clean')
+        $.ajax({
+          type: "POST",
+          url: "/clean",
+          dataType: "json",
+          success: function () {
+            alert('清空成功');
+          },
+
+          error: function () {
+            alert('清空失败');
+          }
+        });
+      }
+      function analysis(){
+        //alert('clean')
+        $.ajax({
+          type: "POST",
+          url: "/analysis",
+          dataType: "json",
+          success: function () {
+            alert('成功');
+          },
+
+          error: function () {
+            alert('失败');
+          }
+        });
+      }
