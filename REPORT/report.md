@@ -74,6 +74,13 @@
 
 ![](20.png)
 
+#### 下载链接：
+- [模型下接链接，密码:1xtx](https://pan.baidu.com/s/17YdyuXywGIyYmfsAAd1plQ)
+可直接用我们训练好的模型，使用[tensorpack说明2.7](../tensorpack/README.md.html)的脚本来进行预测
+- [数据集](https://pan.baidu.com/s/1-caKqEP-hqgNapRDpSbvVQ)
+- [预测](https://pan.baidu.com/s/1MUktHQA95s0SDitlyf_Y9Q)
+
+
 ## 2. sfm系统
 
 ## 稀疏点云模型生成
@@ -103,6 +110,3 @@
 
 
 ![](result.png)
-
-
-
