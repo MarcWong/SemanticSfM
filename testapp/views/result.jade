@@ -35,6 +35,8 @@ html(lang='en')
     script(src='./javascripts/Detector.js')
     script(src='./javascripts/stats.min.js')
     script(src='./javascripts/OrbitControls.js')
+    script(src='./javascripts/DragControls.js')
+    script(src='./javascripts/TransformControls.js')
     script.
       filename = '!{results}'
       //alert(filename)
@@ -48,7 +50,7 @@ html(lang='en')
       document.body.appendChild( container );
       camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
       camera.position.set( 3, 0.15, 3 );
-      cameraTarget = new THREE.Vector3( 0, -0.1, 0 );
+      cameraTarget = new THREE.Vector3( 0, 0, 0 );
       scene = new THREE.Scene();
       scene.background = new THREE.Color( 0xFFFFFF ); // 0x72645b
                                                       //0x87CEEB
@@ -72,7 +74,7 @@ html(lang='en')
       var material = new THREE.PointsMaterial({size:1, vertexColors: THREE.VertexColors,sizeAttenuation: false});
       var mesh = new THREE.Points(geometry,material);
       mesh.position.y =  0;
-      mesh.position.z =  0.1;
+      mesh.position.z =  0;
       mesh.rotation.x = Math.PI /2;
       mesh.scale.multiplyScalar( 0.5 );
       mesh.castShadow = false;
@@ -131,6 +133,18 @@ html(lang='en')
       camera.lookAt( cameraTarget );
       renderer.render( scene, camera );
       }
-      var controls = new THREE.OrbitControls(camera);
+      var controls = new THREE.OrbitControls(camera,renderer.domElement);
       controls.enablePan = true;
       controls.addEventListener('change', render);
+
+      //transformControl = new THREE.TransformControls( camera,renderer.domElement );
+      //scene.add( transformControl );//控件对象添加到场景对象
+      /*
+      var dragcontrols = new THREE.DragControls(scene.children,camera,renderer.domElement );
+          //拖拽控件对象设置鼠标事件
+          dragcontrols.addEventListener( 'hoveron', function ( event ) {
+              //控件对象transformControl与选中的对象object绑定
+              transformControl.attach( event.object );
+          } )
+      */
+      
