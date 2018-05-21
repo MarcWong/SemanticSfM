@@ -1,0 +1,14 @@
+numpy
+six
+termcolor>=1.1
+tabulate>=0.7.7
+tqdm>4.11.1
+msgpack>=0.5.2
+msgpack-numpy>=0.4.0
+pyzmq>=16
+subprocess32; python_version < '3.0'
+functools32; python_version < '3.0'
+pydensecrf
+configparser==3.5.0
+matplotlib==2.1.2
+scikit-image==0.13.1
