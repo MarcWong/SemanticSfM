@@ -47,6 +47,7 @@
 |信息|详情|
 |---|---|
 |训练环境|2块titan Xp|
+|底层框架|tensorflow 1.4|
 |网络结构|deeplab v2|
 |预训练权重|imagenet.resnet101|
 |crop_size|513*513|
