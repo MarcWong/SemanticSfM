@@ -54,7 +54,7 @@ html(lang='en')
                                                       //0x87CEEB
       scene.fog = new THREE.Fog( 0xFFFFFF, 2, 15 );// 0x72645b
       // Ground
-      var plane = new THREE.Mesh(
+      /*var plane = new THREE.Mesh(
       new THREE.PlaneBufferGeometry( 40, 40 ),
       new THREE.MeshPhongMaterial( { color: 0xFFFFFF, specular: 0x101010 } )
       //new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
@@ -63,7 +63,7 @@ html(lang='en')
       plane.rotation.x = 0;//-Math.PI/2;
       plane.position.y = 0;//-0.5;
       scene.add( plane );
-      plane.receiveShadow = true;
+      plane.receiveShadow = true;*/
       // PLY file
       var loader = new THREE.PLYLoader();
       loader.load( filename, function ( geometry ) {
@@ -132,4 +132,5 @@ html(lang='en')
       renderer.render( scene, camera );
       }
       var controls = new THREE.OrbitControls(camera);
+      controls.enablePan = true;
       controls.addEventListener('change', render);
