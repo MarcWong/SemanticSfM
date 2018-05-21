@@ -15,8 +15,6 @@
 具体的构建方法与ps辅助标注工具集参见[PSSD数据集](https://github.com/MarcWong/PSSD)。
 目前构建完成的训练集共156张，测试集共30张，分为三个语义类别：建筑(building)、植被(vegetation)、其他(other)。
 
-- [数据集下载地址]()
-
 ### 2 训练流程（根据可用显存调整batch_size）
 
 
