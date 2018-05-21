@@ -39,7 +39,7 @@
 ## 1. 数据集准备及神经网络训练
 
 ### 1.1 数据准备
-参见[PSSD数据集说明](../dataset/PSSD/README.md.html)
+参见[PSSD数据集说明](../dataset/PSSD/README.pdf)
 
 ### 1.2 训练过程
 
@@ -60,11 +60,15 @@
 |88.7|94.1 |
 
 验证集结果：
-```
-[0521 02:11:06 @deeplabv2res101.pssd_val.py:237] mIoU: 0.887233351966           
+`
+[0521 02:11:06 @deeplabv2res101.pssd_val.py:237] mIoU: 0.887233351966
+`
+`           
 [0521 02:11:06 @deeplabv2res101.pssd_val.py:238] mean_accuracy: 0.940119100083  
+`
+`
 [0521 02:11:06 @deeplabv2res101.pssd_val.py:239] accuracy: 0.941391510495
-```
+`
 
 左图：原图，中图：真实值，右图：预测值
 
@@ -76,7 +80,9 @@
 
 #### 下载链接：
 - [模型下接链接，密码:1xtx](https://pan.baidu.com/s/17YdyuXywGIyYmfsAAd1plQ)
+
 可直接用我们训练好的模型，使用[tensorpack说明2.7](../tensorpack/README.md.html)的脚本来进行预测
+
 - [数据集](https://pan.baidu.com/s/1-caKqEP-hqgNapRDpSbvVQ)
 - [预测](https://pan.baidu.com/s/1MUktHQA95s0SDitlyf_Y9Q)
 
