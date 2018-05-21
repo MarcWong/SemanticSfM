@@ -5,11 +5,11 @@ const fs = require('fs');
 
 /* GET home page. */
 router.get('/result', function(req, res, next) {
-	res.render('result', { title: 'Express',results : '/javascripts/robust_colorized_semantic.ply'});
+	res.render('result', { title: 'Express',results : '/uploads/robust_colorized_semantic.ply'});
 });
 
 router.get('/',function(req, res, next) {
-	res.render('upload', { title: 'Express' });
+	res.render('new_upload', { title: 'Express',content:'' });
 });
 
 router.get('/analysis',function(req, res, next) {
@@ -36,7 +36,7 @@ var upload = multer({ storage: storage })
 
 router.post('/upload',upload.any(),function(req,res,next){
 	console.log(req.files.length);
-    res.json({res_code: '0'});
+    res.render('new_upload', { title: 'Express',content:'success' });
 });
 
 function deleteall(path) {
