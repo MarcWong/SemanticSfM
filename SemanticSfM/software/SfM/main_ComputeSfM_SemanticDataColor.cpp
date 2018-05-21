@@ -123,10 +123,10 @@ bool ColorizeSemanticTracks(
           int idx = trackIds_to_contiguousIndexes[trackId];
           // vec_tracksColor[ trackIds_to_contiguousIndexes[trackId] ] = Vec3(color.r(), color.g(), color.b());
           // cout << "semantic label is[in extract feature color]: " << vec_semanticLabel[idx] << endl;
-          if(vec_semanticLabel[idx] == 0) vec_tracksColor[idx] = Vec3(255, 0, 0);
-          else if(vec_semanticLabel[idx] == 1) vec_tracksColor[idx] = Vec3(0, 255, 0);
-          else if(vec_semanticLabel[idx] == 2) vec_tracksColor[idx] = Vec3(0, 0, 255);
-          else vec_tracksColor[idx] = Vec3(255, 255, 0);
+          if(vec_semanticLabel[idx] == 0) vec_tracksColor[idx] = Vec3(47, 123, 19); // tree
+          else if(vec_semanticLabel[idx] == 1) vec_tracksColor[idx] = Vec3(32, 124, 231); // building
+          else if(vec_semanticLabel[idx] == 2) vec_tracksColor[idx] = Vec3(140, 150, 160);  // road
+          else vec_tracksColor[idx] = Vec3(color.r(), color.g(), color.b());
           set_toRemove.insert(trackId);
           ++my_progress_bar;
         }

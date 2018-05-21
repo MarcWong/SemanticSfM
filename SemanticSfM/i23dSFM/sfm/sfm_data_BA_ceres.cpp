@@ -223,29 +223,29 @@ bool Bundle_Adjustment_Ceres::Adjust(
       // Each Residual block takes a point and a camera as input and outputs a 2
       // dimensional residual. Internally, the cost function stores the observed
       // image location and compares the reprojection against the observation.
-      // ceres::CostFunction* cost_function =
-      //   IntrinsicsToCostFunction(sfm_data.intrinsics[view->id_intrinsic].get(), itObs->second.x);
-
-      // if (cost_function)
-      //   problem.AddResidualBlock(cost_function,
-      //                            p_LossFunction,
-      //                            &map_intrinsics[view->id_intrinsic][0],
-      //                            &map_poses[view->id_pose][0],
-      //                            iterTracks->second.X.data()); //Do we need to copy 3D point to avoid false motion, if failure ?
-
-      // modified by chenyu
       ceres::CostFunction* cost_function =
-      SemanticIntrinsicsToCostFunction(sfm_data.intrinsics[view->id_intrinsic].get(), 
-                                       itObs->second.x, 
-                                       itObs->second.semantic_label,
-                                       iterTracks->second.semantic_label);
+        IntrinsicsToCostFunction(sfm_data.intrinsics[view->id_intrinsic].get(), itObs->second.x);
 
       if (cost_function)
         problem.AddResidualBlock(cost_function,
                                  p_LossFunction,
                                  &map_intrinsics[view->id_intrinsic][0],
                                  &map_poses[view->id_pose][0],
-                                 iterTracks->second.X.data());
+                                 iterTracks->second.X.data()); //Do we need to copy 3D point to avoid false motion, if failure ?
+
+      // modified by chenyu
+      // ceres::CostFunction* cost_function =
+      // SemanticIntrinsicsToCostFunction(sfm_data.intrinsics[view->id_intrinsic].get(), 
+      //                                  itObs->second.x, 
+      //                                  itObs->second.semantic_label,
+      //                                  iterTracks->second.semantic_label);
+
+      // if (cost_function)
+      //   problem.AddResidualBlock(cost_function,
+      //                            p_LossFunction,
+      //                            &map_intrinsics[view->id_intrinsic][0],
+      //                            &map_poses[view->id_pose][0],
+      //                            iterTracks->second.X.data());
     }
     if (!bRefineStructure)
       problem.SetParameterBlockConstant(iterTracks->second.X.data());
