@@ -35,8 +35,9 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage })
 
 router.post('/upload',upload.any(),function(req,res,next){
-	console.log(req.files.length);
-    res.render('new_upload', { title: 'Express',content:'success' });
+	console.log(JSON.stringify(req.files));
+	filename = req.files[0].filename;
+    res.render('result', { title: 'Express',results:'/uploads/'+filename });
 });
 
 function deleteall(path) {

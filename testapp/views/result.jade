@@ -30,13 +30,14 @@ html(lang='en')
       text-align: center;
       }
   body
-    script(src='/javascripts/three.js')
-    script(src='/javascripts/PLYLoader.js')
-    script(src='/javascripts/Detector.js')
-    script(src='/javascripts/stats.min.js')
-    script(src='/javascripts/OrbitControls.js')
+    script(src='./javascripts/three.js')
+    script(src='./javascripts/PLYLoader.js')
+    script(src='./javascripts/Detector.js')
+    script(src='./javascripts/stats.min.js')
+    script(src='./javascripts/OrbitControls.js')
     script.
       filename = '!{results}'
+      //alert(filename)
       if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
       var container, stats;
       var camera, cameraTarget, scene, renderer;
@@ -59,19 +60,20 @@ html(lang='en')
       //new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 
       );
-      plane.rotation.x = -Math.PI/2;
-      plane.position.y = -0.5;
+      plane.rotation.x = 0;//-Math.PI/2;
+      plane.position.y = 0;//-0.5;
       scene.add( plane );
       plane.receiveShadow = true;
       // PLY file
       var loader = new THREE.PLYLoader();
       loader.load( filename, function ( geometry ) {
       geometry.computeVertexNormals();//'/javascripts/robust_colorized_semantic.ply'
-      var material = new THREE.MeshBasicMaterial( {  vertexColors: THREE.VertexColors,flatShading: true } );//0055ff
+      //var material = new THREE.MeshBasicMaterial( {  vertexColors: THREE.VertexColors,flatShading: true} );//0055ff
+      var material = new THREE.PointsMaterial({size:1, vertexColors: THREE.VertexColors,sizeAttenuation: false});
       var mesh = new THREE.Points(geometry,material);
       mesh.position.y =  0;
       mesh.position.z =  0.1;
-      mesh.rotation.x = 0;//Math.PI /2;
+      mesh.rotation.x = Math.PI /2;
       mesh.scale.multiplyScalar( 0.5 );
       mesh.castShadow = false;
       mesh.receiveShadow = false;
