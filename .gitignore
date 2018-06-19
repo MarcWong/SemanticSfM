@@ -8,3 +8,4 @@ matlab_test/build/*
 */node_modules
 */npm-debug.log
 testapp/public/uploads/
+testapp/public/examples/

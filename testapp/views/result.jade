@@ -32,6 +32,7 @@ html(lang='en')
   body
     script(src='./javascripts/three.js')
     script(src='./javascripts/PLYLoader.js')
+    script(src='./javascripts/OBJLoader.js')
     script(src='./javascripts/Detector.js')
     script(src='./javascripts/stats.min.js')
     script(src='./javascripts/OrbitControls.js')
@@ -39,10 +40,10 @@ html(lang='en')
     script(src='./javascripts/TransformControls.js')
     script.
       filename = '!{results}'
-      //alert(filename)
+      //alert(filename.split('.').splice(-1))
       if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
       var container, stats;
-      var camera, cameraTarget, scene, renderer;
+      var camera = cameraTarget = scene = renderer = mesh = id = null;
       init();
       animate();
       function init() {
@@ -66,21 +67,41 @@ html(lang='en')
       plane.position.y = 0;//-0.5;
       scene.add( plane );
       plane.receiveShadow = true;*/
-      // PLY file
-      var loader = new THREE.PLYLoader();
-      loader.load( filename, function ( geometry ) {
-      geometry.computeVertexNormals();//'/javascripts/robust_colorized_semantic.ply'
-      //var material = new THREE.MeshBasicMaterial( {  vertexColors: THREE.VertexColors,flatShading: true} );//0055ff
-      var material = new THREE.PointsMaterial({size:1, vertexColors: THREE.VertexColors,sizeAttenuation: false});
-      var mesh = new THREE.Points(geometry,material);
-      mesh.position.y =  0;
-      mesh.position.z =  0;
-      mesh.rotation.x = Math.PI /2;
-      mesh.scale.multiplyScalar( 0.5 );
-      mesh.castShadow = false;
-      mesh.receiveShadow = false;
-      scene.add( mesh );
-      } );
+      
+      var suffix = filename.split('.').splice(-1)[0];
+      console.log(suffix)
+      if( suffix === 'ply')
+      {
+        // PLY file
+        var loader = new THREE.PLYLoader();
+        loader.load( filename, function ( geometry ) {
+          geometry.computeVertexNormals();//'/javascripts/robust_colorized_semantic.ply'
+          //var material = new THREE.MeshBasicMaterial( {  vertexColors: THREE.VertexColors,flatShading: true} );//0055ff
+          var material = new THREE.PointsMaterial({size:1, vertexColors: THREE.VertexColors,sizeAttenuation: false});
+          mesh = new THREE.Points(geometry,material);
+          mesh.position.y =  0;
+          mesh.position.z =  0;
+          mesh.rotation.x = Math.PI /2;
+          mesh.scale.multiplyScalar( 0.5 );
+          mesh.castShadow = false;
+          mesh.receiveShadow = false;
+          scene.add( mesh );
+        });
+      }
+      else if (suffix === 'obj'){
+        // OBJ file
+        var loader = new THREE.OBJLoader();
+        loader.load( filename, function(obj){
+          obj.traverse(function(child) {
+            if (child instanceof THREE.Mesh) {
+              child.material.side = THREE.DoubleSide;
+            }
+          });
+          mesh = obj;//储存到全局变量中
+          scene.add(obj);//将导入的模型添加到场景中
+        });
+      }
+      
       // Lights
       scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
       addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
@@ -101,30 +122,30 @@ html(lang='en')
       }
       
       function addShadowedLight( x, y, z, color, intensity ) {
-      var directionalLight = new THREE.DirectionalLight( color, intensity );
-      directionalLight.position.set( x, y, z );
-      scene.add( directionalLight );
-      directionalLight.castShadow = true;
-      var d = 1;
-      directionalLight.shadow.camera.left = -d;
-      directionalLight.shadow.camera.right = d;
-      directionalLight.shadow.camera.top = d;
-      directionalLight.shadow.camera.bottom = -d;
-      directionalLight.shadow.camera.near = 1;
-      directionalLight.shadow.camera.far = 4;
-      directionalLight.shadow.mapSize.width = 1024;
-      directionalLight.shadow.mapSize.height = 1024;
-      directionalLight.shadow.bias = -0.001;
+        var directionalLight = new THREE.DirectionalLight( color, intensity );
+        directionalLight.position.set( x, y, z );
+        scene.add( directionalLight );
+        directionalLight.castShadow = true;
+        const d = 1;
+        directionalLight.shadow.camera.left = -d;
+        directionalLight.shadow.camera.right = d;
+        directionalLight.shadow.camera.top = d;
+        directionalLight.shadow.camera.bottom = -d;
+        directionalLight.shadow.camera.near = 1;
+        directionalLight.shadow.camera.far = 4;
+        directionalLight.shadow.mapSize.width = 1024;
+        directionalLight.shadow.mapSize.height = 1024;
+        directionalLight.shadow.bias = -0.001;
       }
       function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize( window.innerWidth, window.innerHeight );
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize( window.innerWidth, window.innerHeight );
       }
       function animate() {
-      requestAnimationFrame( animate );
-      render();
-      stats.update();
+        requestAnimationFrame( animate );
+        render();
+        stats.update();
       }
       function render() {
       var timer = Date.now() * 0.0005;
