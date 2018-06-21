@@ -33,17 +33,20 @@ html(lang='en')
     script(src='./javascripts/three.js')
     script(src='./javascripts/PLYLoader.js')
     script(src='./javascripts/OBJLoader.js')
+    script(src='./javascripts/MTLLoader.js')
     script(src='./javascripts/Detector.js')
     script(src='./javascripts/stats.min.js')
     script(src='./javascripts/OrbitControls.js')
     script(src='./javascripts/DragControls.js')
     script(src='./javascripts/TransformControls.js')
     script.
-      filename = '!{results}'
+      const filename = '!{result1}'
+      const anotherFilename = '!{result2}'
+      let mtlFilename = objFilename = '';
       //alert(filename.split('.').splice(-1))
       if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
       var container, stats;
-      var camera = cameraTarget = scene = renderer = mesh = id = null;
+      var camera = cameraTarget = scene = renderer = mesh = meshes = id = null;
       init();
       animate();
       function init() {
@@ -88,18 +91,50 @@ html(lang='en')
           scene.add( mesh );
         });
       }
-      else if (suffix === 'obj'){
-        // OBJ file
-        var loader = new THREE.OBJLoader();
-        loader.load( filename, function(obj){
-          obj.traverse(function(child) {
-            if (child instanceof THREE.Mesh) {
-              child.material.side = THREE.DoubleSide;
-            }
+      else if (suffix === 'obj' || suffix === 'mtl'){ 
+
+        // texture
+        var texture = new THREE.Texture();
+        var imageloader = new THREE.ImageLoader();
+        imageloader.load( '/examples/limao/mvs/scene_dense_mesh_refine_texture_material_0000_map_Kd.png', function ( image ) {
+            texture.image = image;
+            texture.needsUpdate = true;
+        } );
+        console.log(texture)
+
+        // OBJ file, with mtl
+        if(suffix === 'obj'){
+          mtlFilename = anotherFilename;
+          objFilename = filename;
+        }
+        else{
+          mtlFilename = filename;
+          objFilename = anotherFilename;
+        }
+        console.log(mtlFilename)
+        console.log(objFilename)
+
+        //- var mtlLoader = new THREE.MTLLoader();
+        //- mtlLoader.load( mtlFilename, function( materials ) {
+        //-   materials.preload();
+          var objLoader = new THREE.OBJLoader();
+
+          // objLoader.setPath( "http://threejs.org/examples/obj/walt/" );
+          //- objLoader.setMaterials( materials );
+          objLoader.load( objFilename, function(obj){
+            obj.traverse( function ( child ) {
+              if ( child instanceof THREE.Mesh ) {
+                child.material =  new THREE.MeshPhongMaterial({map: texture, specular: 0xfceed2, shininess: 0});
+                  //- child.material.map = texture;
+                  //-     child.material.side = THREE.DoubleSide;
+              }
+            });
+
+            mesh = obj;//储存到全局变量中
+            //- mesh.position.y = -50;
+            scene.add(obj);//将导入的模型添加到场景中
           });
-          mesh = obj;//储存到全局变量中
-          scene.add(obj);//将导入的模型添加到场景中
-        });
+        //- });
       }
       
       // Lights

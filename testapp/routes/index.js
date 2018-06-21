@@ -36,8 +36,14 @@ var upload = multer({ storage: storage })
 
 router.post('/upload',upload.any(),function(req,res,next){
 	console.log(JSON.stringify(req.files));
-	filename = req.files[0].filename;
-    res.render('result', { title: 'Express',results:'/uploads/'+filename });
+	var filename = req.files[0].filename;
+	console.log(filename);
+	if(req.files.length>1)
+	{
+		var anotherFilename = req.files[1].filename;
+		res.render('result', { title: 'Express',result1:'/uploads/'+filename, result2:'/uploads/' + anotherFilename});
+	}
+    res.render('result', { title: 'Express',result1:'/uploads/'+filename, result2: 'undefined'});
 });
 
 function deleteall(path) {
