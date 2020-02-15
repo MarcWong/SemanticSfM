@@ -5,6 +5,15 @@ This repository contains the reference code for sparse semantic reconstruction p
 
 The PDF of the article is available at this [link](https://link.springer.com/content/pdf/10.1007%2F978-3-030-03398-9_30.pdf).
 
+
+## Abstract
+
+Structure from Motion (SfM) and semantic segmentation are two branches of computer vision. However, few previous methods integrate the two branches together. SfM is limited by the precision of traditional feature detecting method, especially in complicated scenes. As the research field of semantic segmentation thrives, we could gain semantic information of high confidence in each specific task with little effort. By utilizing semantic segmentation information, our paper presents a new way to boost the accuracy of feature point matching. Besides, with the semantic constraints taken from the result of semantic segmentation, a new bundle adjustment method with equality constraint is proposed. By exploring the sparsity of equality constraint, it indicates that constrained bundle adjustment can be solved by Sequential Quadratic Programming (SQP) efficiently. The proposed approach achieves state of the art accuracy, and, by grouping the descriptors together by their semantic labels, the speed of putative matches is slightly boosted. Moreover, our approach demonstrates a potential of automatic labeling of semantic segmentation. In a nutshell, our work strongly verifies that SfM and semantic segmentation benefit from each other.
+
+![pipeline](REPORT/result.png)
+
+## Code Contribution
+
 |Code Contributor|Contribution|
 |---|---|
 | Yu Chen(陈煜) |Structure from Motion|
@@ -13,7 +22,7 @@ The PDF of the article is available at this [link](https://link.springer.com/con
 
 **Code for other usages are not allowed!**
 
-## code map
+## Code Map
 
 ```
 $Root Directory
