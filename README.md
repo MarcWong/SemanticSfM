@@ -1,18 +1,22 @@
 # DIP-i23d
-Our own 3d reconstruction project of Digital Image Processing course in Peking University.
 
-|Author|
-|------|
-| 陈煜 |
-|王旭普|
-| 王尧 |
+This repository contains the reference code for sparse semantic reconstruction process based on the following paper: **Semantic 3D Reconstruction with Learning MVS and 2D Segmentation of Aerial Images**
+
+
+The PDF of the article is available at this [link](https://link.springer.com/content/pdf/10.1007%2F978-3-030-03398-9_30.pdf).
+
+|Code Contributor|Contribution|
+|---|---|
+| Yu Chen(陈煜) |Structure from Motion|
+| Yao Wang(王尧) |Semantic Segmentation|
+|Xupu Wang(王旭普)|Data Visualization|
 
 **Code for other usages are not allowed!**
 
 ## code map
 
 ```
-$DIP-i23d
+$Root Directory
 │
 │─ README.md —— this file
 │
