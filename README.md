@@ -1,6 +1,6 @@
 # DIP-i23d
 
-This repository contains the reference code for sparse semantic reconstruction process based on the following paper: **Semantic 3D Reconstruction with Learning MVS and 2D Segmentation of Aerial Images**
+This repository contains the reference code for sparse semantic reconstruction process based on the following paper: [**Semantic 3D Reconstruction with Learning MVS and 2D Segmentation of Aerial Images**](https://link.springer.com/chapter/10.1007/978-3-030-03398-9_30)
 
 
 The PDF of the article is available at this [link](https://link.springer.com/content/pdf/10.1007%2F978-3-030-03398-9_30.pdf).
